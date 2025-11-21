@@ -1,0 +1,11 @@
+/.cproject
+/.project
+/.settings
+*.java
+/Debug
+/Profile
+/Release
+/linux/
+/bebboget.readme.bak
+/dist/
+/versions/

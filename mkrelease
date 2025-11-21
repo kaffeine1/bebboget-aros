@@ -1,0 +1,46 @@
+
+# get revision
+major=$(grep MAJOR include/revision.h)
+major=${major#*\"}
+major=${major%%\"*}
+major=$(echo ${major} | xargs)
+
+minor=$(grep MINOR include/revision.h)
+minor=${minor#*\"}
+minor=${minor%%\"*}
+minor=$(echo ${minor} | xargs)
+
+echo $major.$minor
+
+sed -i.bak -e "s/Version:.*/Version:      $major.$minor/g" bebboget.readme
+
+rm -rf dist
+mkdir -p dist/bebboget/lib
+
+make Release=1 clean
+make CPU=-m68000 MAJOR=$major MINOR=$minor STRIP=-s Release=1 -j8 all
+cp Release/bebboget dist/bebboget/bebboget00
+cp Release/installcerts dist/bebboget/installcerts
+cp Release/libbebboget.a dist/bebboget/lib/libbebboget00.a
+
+make Release=1 clean
+make MAJOR=$major MINOR=$minor STRIP=-s Release=1 -j8 all
+cp Release/bebboget dist/bebboget
+cp Release/libbebboget.a dist/bebboget/lib/
+
+# copy glue code for the lib
+cp src/bg.cpp dist/bebboget/lib/
+cp include/bebboget.h dist/bebboget/lib/
+
+cp bebboget.readme dist/bebboget
+cp COPYING dist/bebboget
+cp LICENSE dist/bebboget
+
+cd dist
+lha a bebboget.lha bebboget
+cd ..
+cp bebboget.readme dist
+
+mkdir -p versions
+echo _${major}.${minor}_
+cp dist/bebboget.lha versions/bebboget.${major}-${minor}.lha

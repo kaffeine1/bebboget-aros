@@ -1,0 +1,7 @@
+CompileFlags:
+  CompilationDatabase: /home/stefan/workspaces/c0/amigassl
+  Add: [
+    -I/home/stefan/workspaces/c0/amigassl/include,
+    -I/home/stefan/workspaces/c0/amigassl/src,
+    -I/usr/local/include
+  ]
