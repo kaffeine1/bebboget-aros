@@ -69,7 +69,7 @@ LIB_SOURCES = $(EXTRA_LIB_SOURCES) bg.cpp \
 	biginteger.cpp unhexlify.c equals.cpp dump.c\
 	stream.cpp socket.cpp \
 	vector.cpp c++support.cpp \
-	chacha20.cpp \
+	chacha20.cpp poly1305.cpp chacha20poly1305.cpp \
 	md.cpp sha256.cpp sha384512.cpp sha512.cpp sha384.cpp sha.cpp md5.cpp bc.cpp \
 	aes.cpp rc4.cpp des.cpp des3.cpp gcm.cpp \
 	rand.cpp log.c mimedecode.c certstuff.cpp\

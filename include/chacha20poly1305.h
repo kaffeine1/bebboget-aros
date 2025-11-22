@@ -21,8 +21,6 @@
  *          using ChaCha20 stream cipher and Poly1305 authenticator.
  *
  * Features:
- *  - ChaCha20 stream cipher implementation
- *  - Poly1305 message authentication code
  *  - Combined ChaCha20-Poly1305 AEAD construction
  *  - Support for nonce initialization, AAD processing, and tag calculation
  *
@@ -37,75 +35,8 @@
 #ifndef __CHACHA20POLY1305__H__
 #define __CHACHA20POLY1305__H__
 
-#include "bc.h"
-
-/**
- * @class ChaCha20
- * @brief ChaCha20 stream cipher implementation.
- *
- * Provides encryption and decryption of data streams using
- * the ChaCha20 algorithm. Supports nonce setup and block
- * generation for stream output.
- */
-class ChaCha20 : public BlockCipher {
-    friend class ChaCha20Poly1305;
-    uint32_t state[16]; ///< Internal state
-    byte stream[64];    ///< Current keystream block
-    int pos;            ///< Position within stream
-public:
-    /// Constructor initializes position to end of stream
-    ChaCha20() : pos(64) {}
-    virtual ~ChaCha20();
-
-    /// Decrypt data using ChaCha20
-    virtual void decrypt(void* clearText, void const* cipherText);
-
-    /// Encrypt data using ChaCha20
-    virtual void encrypt(void* cipherText, void const* clearText);
-
-    /// Set key material
-    virtual int setKey(void const* key, unsigned keylen);
-
-    /// Return block size (64 bytes for ChaCha20)
-    virtual int blockSize() const;
-
-    /// Encrypt/decrypt arbitrary-length stream
-    void chacha(void* cipherText, void const* clearText, int length);
-
-    /// Set nonce for stream cipher
-    int setNonce(void const* nonce, unsigned nonceLen);
-
-    /// Generate next keystream block
-    void nextBlock();
-
-    /// Access current keystream
-    inline byte const* getStream() const { return stream; }
-
-    /// Reset counter to initial value
-    void zeroCounter() { state[12] = 0xffffffff; }
-};
-
-/**
- * @class Poly1305
- * @brief Poly1305 message authentication code.
- *
- * Provides authentication over ciphertext and AAD
- * using a one-time key derived from ChaCha20.
- */
-class Poly1305 {
-    uint32_t r[5]; ///< Key parameter r
-    uint32_t s[4]; ///< Key parameter s
-    uint32_t a[10];///< Accumulator
-public:
-    /// Set Poly1305 key
-    int setKey(void const* k, int klen);
-
-    /// Update MAC with data
-    void update(void const* d, int len);
-
-    /// Finalize and produce digest
-    void digest(void* to);
-};
+#include "chacha20.h"
+#include "poly1305.h"
 
 /**
  * @class ChaCha20Poly1305
