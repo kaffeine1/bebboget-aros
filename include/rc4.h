@@ -39,7 +39,7 @@
 #include <bytearray.h>
 
 class RC4 : public BlockCipher {
-    byte key[258];  ///< RC4 key schedule buffer
+	uint8_t key[258];  ///< RC4 key schedule buffer
 
 public:
     /// Construct RC4 cipher

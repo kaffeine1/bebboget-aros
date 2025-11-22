@@ -37,20 +37,20 @@
 
 #include <ecmath.h>
 
-bytea ECMath::x25519(byte *clientPrivateKey, byte *dhg) {
+bytea ECMath::x25519(uint8_t *clientPrivateKey, uint8_t *dhg) {
     bytea x;
     return x;
 }
 
-void ECMath::x25519Pub(byte *pub, byte *priv) {
+void ECMath::x25519Pub(uint8_t *pub, uint8_t *priv) {
 }
 
-bytea ECMath::x448(byte *clientPrivateKey, byte *dhg) {
+bytea ECMath::x448(uint8_t *clientPrivateKey, uint8_t *dhg) {
     bytea x;
     return x;
 }
 
-void ECMath::x448Pub(byte *pub, byte *priv) {
+void ECMath::x448Pub(uint8_t *pub, uint8_t *priv) {
 }
 
 bytea ECMath::genPrivateKey(int curve) {

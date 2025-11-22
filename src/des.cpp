@@ -144,7 +144,7 @@ int DES::blockSize() const {
  * @param _v a byte
  * @return true if the byte contains an odd count of 1 bits.
  */
-static int isOdd(byte _v) {
+static int isOdd(uint8_t _v) {
     unsigned char v = _v & 0xff;
     v = (v >> 4) ^ (v & 0xf);
     v = (v >> 2) ^ (v & 0x3);
@@ -153,7 +153,7 @@ static int isOdd(byte _v) {
 
 int DES::setKey(const void *keyData_, unsigned keylen) {
     bytes(k, keylen);
-    byte *key = k.begin();
+    uint8_t *key = k.begin();
     memcpy(k.begin(), keyData_, keylen);
 
     // Enforce odd parity in each key byte
@@ -226,8 +226,8 @@ void DES::decrypt(void *clearText, void const *cipherText) {
 }
 
 void DES::des(void *out_, void const *in_, int inc) {
-    byte *outData = (byte *)out_;
-    byte const *inData = (byte const *)in_;
+	uint8_t *outData = (uint8_t *)out_;
+	uint8_t const *inData = (uint8_t const *)in_;
     int inOff = 0;
     int outOff = 0;
 
@@ -297,12 +297,12 @@ void DES::des(void *out_, void const *in_, int inc) {
     work = ((r >>  4) ^ l) & 0x0f0f0f0f; l ^= work; r ^= (work << 4);
 
     // write data out (left | right)
-    outData[outOff++] = (byte)(l       );
-    outData[outOff++] = (byte)(l >>  8);
-    outData[outOff++] = (byte)(l >> 16);
-    outData[outOff++] = (byte)(l >> 24);
-    outData[outOff++] = (byte)(r       );
-    outData[outOff++] = (byte)(r >>  8);
-    outData[outOff++] = (byte)(r >> 16);
-    outData[outOff  ] = (byte)(r >> 24);
+    outData[outOff++] = (uint8_t)(l       );
+    outData[outOff++] = (uint8_t)(l >>  8);
+    outData[outOff++] = (uint8_t)(l >> 16);
+    outData[outOff++] = (uint8_t)(l >> 24);
+    outData[outOff++] = (uint8_t)(r       );
+    outData[outOff++] = (uint8_t)(r >>  8);
+    outData[outOff++] = (uint8_t)(r >> 16);
+    outData[outOff  ] = (uint8_t)(r >> 24);
 }

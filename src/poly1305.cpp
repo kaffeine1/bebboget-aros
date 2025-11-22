@@ -46,7 +46,7 @@
 int Poly1305::setKey(void const* k, int klen) {
     if (klen != 32)
         return false;
-    byte const* b = (byte const*) k;
+    uint8_t const* b = (uint8_t const*) k;
 #ifdef DEBUG
     _dump("poly key", k, klen);
 #endif
@@ -126,7 +126,7 @@ void caddmodmul(uint32_t* a, uint32_t const* n, uint32_t const* r) {
 #endif
 
 void Poly1305::update(void const* d, int len) {
-    byte const* b = (byte const*) d;
+	uint8_t const* b = (uint8_t const*) d;
 #ifdef DEBUG
     _dump("poly update", d, len);
 #endif
@@ -168,7 +168,7 @@ void Poly1305::update(void const* d, int len) {
 
 void Poly1305::digest(void* to) {
     FastMath32::add(a, a, 5, s, 4);
-    byte* p = (byte*) to;
+    uint8_t* p = (uint8_t*) to;
     for (int i = 0, j = 0; i < 4; ++i, j += 4) {
         uint32_t t = a[i];
         p[j + 0] = t;

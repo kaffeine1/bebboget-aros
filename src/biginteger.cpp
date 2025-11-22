@@ -113,7 +113,7 @@ BigInteger::BigInteger(unsigned int ui)
 }
 
 /// Construct BigInteger from byte array
-BigInteger::BigInteger(short signum_, byte const* b, int len)
+BigInteger::BigInteger(short signum_, uint8_t const* b, int len)
 : signum(signum_), n(M.get()) {
     bytez ba(b, len);
     uinta i = FastMath32::byte2Int(ba, (ba.size() + 3) / 4);

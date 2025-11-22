@@ -219,7 +219,7 @@ protected:
     int readFully(uint8_t* b, int length);
     int readahead();
     int rawread(uint8_t* b, int blen, int typ);
-    int rawwrite(byte* b, unsigned len, int typ);
+    int rawwrite(uint8_t* b, unsigned len, int typ);
 
     int innerRead();
     int hs_read(int msgType);
@@ -251,7 +251,7 @@ protected:
     void createKeys(int isServer);
 
     /// Compute Finished message hash
-    bytea finishedHash(char const* cs, byte const* csData);
+    bytea finishedHash(char const* cs, uint8_t const* csData);
 
     /// Calculate handshake hash
     void calc_hs_hash(void* to, MessageDigest* md, int len, bytez& sender);

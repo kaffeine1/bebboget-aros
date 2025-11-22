@@ -50,11 +50,11 @@
 int testChaCha20() {
 	puts("testChaCha20");
 
-	byte key[32];
+	uint8_t key[32];
 	unhexlify(key, "00:01:02:03:04:05:06:07:08:09:0a:0b:0c:0d:0e:0f:"
 			"10:11:12:13:14:15:16:17:18:19:1a:1b:1c:1d:1e:1f");
 
-	byte nonce[12];
+	uint8_t nonce[12];
 	unhexlify(nonce, "00:00:00:00:00:00:00:4a:00:00:00:00");
 
 	ChaCha20 cc;
@@ -63,7 +63,7 @@ int testChaCha20() {
 
 	cc.nextBlock();
 
-	byte block1[64];
+	uint8_t block1[64];
 	unhexlify(block1, "22 4F 51 F3 40 1B D9 E1  2F DE 27 6F B8 63 1D ED"
 			"8C 13 1F 82 3D 2C 06 E2  7E 4F CA EC 9E F3 CF 78"
 			"8A 3B 0A A3 72 60 0A 92  B5 79 74 CD ED 2B 93 34"
@@ -72,7 +72,7 @@ int testChaCha20() {
 	int r = assertArrayEquals(block1, cc.getStream(), 64);
 
 	cc.nextBlock();
-	byte block2[64];
+	uint8_t block2[64];
 	unhexlify(block2, "69 A6 74 9F 3F 63 0F 41  22 CA FE 28 EC 4D C4 7E"
 			"26 D4 34 6D 70 B9 8C 73  F3 E9 C5 3A C4 0C 59 45"
 			"39 8B 6E DA 1A 83 2C 89  C1 67 EA CD 90 1D 7E 2B"
@@ -85,7 +85,7 @@ int testChaCha20() {
 	cc.setKey(key, sizeof(key));
 	cc.setNonce(nonce, sizeof(nonce));
 	cc.nextBlock();
-	byte test1[64];
+	uint8_t test1[64];
 	unhexlify(test1,	"9F 07 E7 BE 55 51 38 7A  98 BA 97 7C 73 2D 08 0D "
 			"CB 0F 29 A0 48 E3 65 69  12 C6 53 3E 32 EE 7A ED"
 			"29 B7 21 76 9C E6 4E 43  D5 71 33 B0 74 D8 39 D5 "
@@ -94,11 +94,11 @@ int testChaCha20() {
 
 
 
-	byte key1[32];
+	uint8_t key1[32];
 	unhexlify(key1,
 			"80 81 82 83 84 85 86 87 88 89 8a 8b 8c 8d 8e 8f"
 			"90 91 92 93 94 95 96 97 98 99 9a 9b 9c 9d 9e 9f");
-	byte nonce1[12] = { 0x07, 0, 0, 0,
+	uint8_t nonce1[12] = { 0x07, 0, 0, 0,
 			0x40, 0x41, 0x42, 0x43,
 			0x44, 0x45, 0x46, 0x47,
 	};
@@ -107,7 +107,7 @@ int testChaCha20() {
 	cc.zeroCounter();
 	cc.nextBlock();
 
-	byte exp1[32];
+	uint8_t exp1[32];
 	unhexlify(exp1,
 			"7b ac 2b 25 2d b4 47 af 09 b6 7a 55 a4 e9 55 84"
 			"0a e1 d6 73 10 75 d9 eb 2a 93 75 78 3e d5 53 ff"
@@ -120,13 +120,13 @@ int testChaCha20() {
 int testPoly1305() {
 	puts("testPoly1305");
 
-//	byte message[34];
+//	uint8_t message[34];
 //	/* Message to be Authenticated: */
 //	unhexlify(message, "43 72 79 70 74 6f 67 72 61 70 68 69 63 20 46 6f"
 //			"72 75 6d 20 52 65 73 65 61 72 63 68 20 47 72 6f"
 //			"75 70");
 //
-//	byte key[32];
+//	uint8_t key[32];
 //	unhexlify(key, "85:d6:be:78:57:55:6d:33:7f:44:52:fe:42:d5:06:a8"
 //			"01:03:80:8a:fb:0d:b2:fd:4a:bf:f6:af:41:49:f5:1b");
 //
@@ -134,12 +134,12 @@ int testPoly1305() {
 //	poly.setKey(key, sizeof(key));
 //	poly.update(message, sizeof(message));
 
-	byte res[16];
+	uint8_t res[16];
 
 	// test 1
-	byte key1[32]; memset(key1, 0, sizeof(key1));
-	byte text1[64]; memset(text1, 0, sizeof(text1));
-	byte exp1[16]; memset(exp1, 0, sizeof(exp1));
+	uint8_t key1[32]; memset(key1, 0, sizeof(key1));
+	uint8_t text1[64]; memset(text1, 0, sizeof(text1));
+	uint8_t exp1[16]; memset(exp1, 0, sizeof(exp1));
 	Poly1305 poly;
 	poly.setKey(key1, sizeof(key1));
 	poly.update(text1, sizeof(text1));
@@ -147,12 +147,12 @@ int testPoly1305() {
 
 	int r = assertArrayEquals(exp1, res, 16);
 
-	byte key2[32];
+	uint8_t key2[32];
 	unhexlify(key2,
 			"00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
 			"36 e5 f6 b5 c5 e0 60 70 f0 ef ca 96 22 7a 86 3e"
 			);
-	byte text2[368 + 7];
+	uint8_t text2[368 + 7];
 	unhexlify(text2,
 			   "41 6e 79 20 73 75 62 6d 69 73 73 69 6f 6e 20 74 "
 			   "6f 20 74 68 65 20 49 45 54 46 20 69 6e 74 65 6e "
@@ -180,7 +180,7 @@ int testPoly1305() {
 			   "73 73 65 64 20 74 6f"
 );
 
-	byte exp2[16];
+	uint8_t exp2[16];
 	unhexlify(exp2, "36 e5 f6 b5 c5 e0 60 70 f0 ef ca 96 22 7a 86 3e");
 
 	poly.setKey(key2, sizeof(key2));
@@ -190,12 +190,12 @@ int testPoly1305() {
 	r &= assertArrayEquals(exp2, res, 16);
 
 
-	byte key3[32];
+	uint8_t key3[32];
 	unhexlify(key3,
 			"1c 92 40 a5 eb 55 d3 8a f3 33 88 86 04 f6 b5 f0 "
 			"47 39 17 c1 40 2b 80 09 9d ca 5c bc 20 70 75 c0"
 			);
-	byte text3[112 + 15];
+	uint8_t text3[112 + 15];
 	unhexlify(text3,
 			   "27 54 77 61 73 20 62 72 69 6c 6c 69 67 2c 20 61"
 			   "6e 64 20 74 68 65 20 73 6c 69 74 68 79 20 74 6f"
@@ -206,7 +206,7 @@ int testPoly1305() {
 			   "73 2c 0a 41 6e 64 20 74 68 65 20 6d 6f 6d 65 20"
 			   "72 61 74 68 73 20 6f 75 74 67 72 61 62 65 2e" );
 
-	byte exp3[16];
+	uint8_t exp3[16];
 	unhexlify(exp3, "45 41 66 9a 7e aa ee 61 e7 08 dc 7c bc c5 eb 62 ");
 
 	poly.setKey(key3, sizeof(key3));
@@ -219,17 +219,17 @@ int testPoly1305() {
 	// If one uses 130-bit partial reduction, does the code
     // handle the case where partially reduced final result is not fully
     // reduced?
-	byte key4[32];
+	uint8_t key4[32];
 	unhexlify(key4,
 			"02 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
 			"00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
 			);
-	byte text4[16];
+	uint8_t text4[16];
 	unhexlify(text4,
 			"ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff"
 	);
 
-	byte exp4[16];
+	uint8_t exp4[16];
 	unhexlify(exp4, "03 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00");
 
 	poly.setKey(key4, sizeof(key4));
@@ -238,17 +238,17 @@ int testPoly1305() {
 	r &= assertArrayEquals(exp4, res, 16);
 
 	// What happens if addition of s overflows modulo 2^128?
-	byte key5[32];
+	uint8_t key5[32];
 	unhexlify(key5,
 			"02 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00"
 			"ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff"
 			);
-	byte text5[16];
+	uint8_t text5[16];
 	unhexlify(text5,
 			"02 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
 	);
 
-	byte exp5[16];
+	uint8_t exp5[16];
 	unhexlify(exp5, "03 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00");
 
 	poly.setKey(key5, sizeof(key5));
@@ -257,19 +257,19 @@ int testPoly1305() {
 	r &= assertArrayEquals(exp5, res, 16);
 
 	// What happens if data limb is all ones and there is carry from lower limb?
-	byte key6[32];
+	uint8_t key6[32];
 	unhexlify(key6,
 			"01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
 			"00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
 			);
-	byte text6[48];
+	uint8_t text6[48];
 	unhexlify(text6,
 			"ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff"
 			"f0 ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff"
 			"11 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
 	);
 
-	byte exp6[16];
+	uint8_t exp6[16];
 	unhexlify(exp6, "05 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00");
 
 	poly.setKey(key6, sizeof(key6));
@@ -279,19 +279,19 @@ int testPoly1305() {
 
 
 	// What happens if final result from polynomial part is exactly 2^130-5?
-	byte key7[32];
+	uint8_t key7[32];
 	unhexlify(key7,
 			"01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
 			"00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
 			);
-	byte text7[48];
+	uint8_t text7[48];
 	unhexlify(text7,
 			"ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff"
 			"fb fe fe fe fe fe fe fe  fe fe fe fe fe fe fe fe"
 			"01 01 01 01 01 01 01 01  01 01 01 01 01 01 01 01"
 	);
 
-	byte exp7[16];
+	uint8_t exp7[16];
 	unhexlify(exp7, "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00");
 
 	poly.setKey(key7, sizeof(key7));
@@ -300,17 +300,17 @@ int testPoly1305() {
 	r &= assertArrayEquals(exp7, res, 16);
 
 	// What happens if final result from polynomial part is exactly 2^130-6?
-	byte key8[32];
+	uint8_t key8[32];
 	unhexlify(key8,
 			"02 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
 			"00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
 			);
-	byte text8[16];
+	uint8_t text8[16];
 	unhexlify(text8,
 			"fd ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff"
 	);
 
-	byte exp8[16];
+	uint8_t exp8[16];
 	unhexlify(exp8, "fa ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff");
 
 	poly.setKey(key8, sizeof(key8));
@@ -319,18 +319,18 @@ int testPoly1305() {
 	r &= assertArrayEquals(exp8, res, 16);
 
 	//  What happens if 5*H+L-type reduction produces 131-bit final result?
-	byte key9[32];
+	uint8_t key9[32];
 	unhexlify(key9,
 			"01 00 00 00 00 00 00 00  04 00 00 00 00 00 00 00"
 			"00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00"
 			);
-	byte text9[48];
+	uint8_t text9[48];
 	unhexlify(text9,
 		"E3 35 94 D7 50 5E 43 B9 00 00 00 00 00 00 00 00"
 		   "33 94 D7 50 5E 43 79 CD 01 00 00 00 00 00 00 00"
 		   "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"	);
 
-	byte exp9[16];
+	uint8_t exp9[16];
 	unhexlify(exp9, "13 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00");
 
 	poly.setKey(key9, sizeof(key9));
@@ -339,7 +339,7 @@ int testPoly1305() {
 	r &= assertArrayEquals(exp9, res, 16);
 
 	// from tls
-	byte pkey[32];
+	uint8_t pkey[32];
 	unhexlify(pkey,
 			"EA 16 55 AB 23 7E F8 A0  93 C2 5B 81 26 9B B5 B9"
 			"71 76 01 88 37 C0 69 F0  52 3F B3 FD 30 09 FB 7C"
@@ -348,7 +348,7 @@ int testPoly1305() {
 	Poly1305 pl;
 	pl.setKey(pkey, 32);
 
-	byte d[16];
+	uint8_t d[16];
 	unhexlify(d,
 			"17 03 03 00 1B 00 00 00  00 00 00 00 00 00 00 00"
 			);
@@ -364,10 +364,10 @@ int testPoly1305() {
 			);
 	pl.update(d, 16);
 
-	byte to[16];
+	uint8_t to[16];
 	pl.digest(to);
 
-	byte x[16];
+	uint8_t x[16];
 	unhexlify(x,
 			"29 09 80 EE 1B 01 DC 15  CA 5D 71 B0 2C A5 19 30");
 
@@ -380,13 +380,13 @@ int testChaCha20Poly1305() {
 	puts("testChaCha20Poly1305");
 
 
-	byte key[32];
+	uint8_t key[32];
 	unhexlify(key,
 			"1c 92 40 a5 eb 55 d3 8a f3 33 88 86 04 f6 b5 f0 "
 			"47 39 17 c1 40 2b 80 09 9d ca 5c bc 20 70 75 c0"
 			);
 
-	byte clear[256 + 9];
+	uint8_t clear[256 + 9];
 	unhexlify(clear,
 			 "49 6e 74 65 72 6e 65 74 2d 44 72 61 66 74 73 20"
 			 "61 72 65 20 64 72 61 66 74 20 64 6f 63 75 6d 65"
@@ -407,18 +407,18 @@ int testChaCha20Poly1305() {
 			 "72 65 73 73 2e 2f e2 80 9d"
 	);
 
-	byte nonce[12];
+	uint8_t nonce[12];
 	unhexlify(nonce,
 			"00 00 00 00 01 02 03 04 05 06 07 08 "
 			);
 
-	byte aad[12];
+	uint8_t aad[12];
 	unhexlify(aad,
 			"f3 33 88 86 00 00 00 00 00 00 4e 91"
 			);
 
-	byte cipher[sizeof(clear)];
-	byte tag[16];
+	uint8_t cipher[sizeof(clear)];
+	uint8_t tag[16];
 
 	ChaCha20Poly1305 ccp;
 	ccp.setKey(key, 32);
@@ -428,7 +428,7 @@ int testChaCha20Poly1305() {
 	ccp.calcHash(tag);
 //	_dump("tag", tag, 16);
 
-	byte exp[16];
+	uint8_t exp[16];
 	unhexlify(exp, "ee ad 9d 67 89 0c bb 22 39 23 36 fe a1 85 1f 38");
 
 	int r = assertArrayEquals(exp, tag, 16);

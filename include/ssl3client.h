@@ -70,15 +70,15 @@ private:
     int newClientHello(char const* serverName);
 
     /// Add extensions and parameters to ClientHello
-    int addClientRandom(byte* b, int off);
-    int addSessionId(byte* b, int off);
-    int addCipherTypes(byte* b, int off);
-    int addCompression(byte* b, int off);
-    int addServerNameExtension(byte* b, int off, char const* name);
-    int addSupportedGroups(byte* b, int off);
-    int addSignatureAlgorithms(byte* b, int off);
-    int addSupportedVersions(byte* b, int off);
-    int addKeyShare(byte* b, int off);
+    int addClientRandom(uint8_t* b, int off);
+    int addSessionId(uint8_t* b, int off);
+    int addCipherTypes(uint8_t* b, int off);
+    int addCompression(uint8_t* b, int off);
+    int addServerNameExtension(uint8_t* b, int off, char const* name);
+    int addSupportedGroups(uint8_t* b, int off);
+    int addSignatureAlgorithms(uint8_t* b, int off);
+    int addSupportedVersions(uint8_t* b, int off);
+    int addKeyShare(uint8_t* b, int off);
 
     /// Parse ServerHello and perform handshake
     int parseServerHello3();
@@ -92,7 +92,7 @@ private:
     bytea makeSignatureData13(MessageDigest* hsHash);
 
     /// Construct signature data for TLS 1.2
-    bytea makeSignatureData12(byte* b, int off);
+    bytea makeSignatureData12(uint8_t* b, int off);
 
     /// Parse server certificate chain
     mstl::vector<bytea> parseCertificate3(bytea& b, int off);

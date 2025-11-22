@@ -39,7 +39,7 @@ class SecpR1 {
 public:
     /// Verify ECDSA signature from raw signature data
     static int verify(bytez const& messageHash,
-                      byte const* sigData,
+    		uint8_t const* sigData,
                       int len,
                       bytez const& pubk);
 
@@ -55,7 +55,7 @@ public:
 class SecpR2 {
 public:
     static int verify(bytez const& messageHash,
-                      byte const* sigData,
+    				uint8_t const* sigData,
                       int len,
                       bytez const& pubk);
     static int verify(bytez const& messageHash,

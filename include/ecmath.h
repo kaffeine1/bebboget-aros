@@ -42,16 +42,16 @@
 class ECMath {
 public:
     /// Perform X25519 Diffie-Hellman exchange
-    static bytea x25519(byte* clientPrivateKey, byte* dhg);
+    static bytea x25519(uint8_t* clientPrivateKey, uint8_t* dhg);
 
     /// Derive X25519 public key from private
-    static void x25519Pub(byte* pub, byte* priv);
+    static void x25519Pub(uint8_t* pub, uint8_t* priv);
 
     /// Perform X448 Diffie-Hellman exchange
-    static bytea x448(byte* clientPrivateKey, byte* dhg);
+    static bytea x448(uint8_t* clientPrivateKey, uint8_t* dhg);
 
     /// Derive X448 public key from private
-    static void x448Pub(byte* pub, byte* priv);
+    static void x448Pub(uint8_t* pub, uint8_t* priv);
 
     /// Generate a private key for given curve (25519 or 448)
     static bytea genPrivateKey(int curve);

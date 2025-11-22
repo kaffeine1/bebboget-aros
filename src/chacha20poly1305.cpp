@@ -73,7 +73,7 @@ int ChaCha20Poly1305::isAAD() const {
 }
 
 void ChaCha20Poly1305::updateHash(void const* d, int sz) {
-    byte aad[16];
+	uint8_t aad[16];
     memcpy(aad, d, sz);
     memset(aad + sz, 0, 16 - sz);
     poly.update(aad, 16);
@@ -91,9 +91,9 @@ void ChaCha20Poly1305::polly(void const* cipher, int len) {
         poly.update(cipher, end);
 
     if (rest) {
-        byte b0[16];
+    	uint8_t b0[16];
         int i = 0;
-        byte const* c = (byte const*) cipher;
+        uint8_t const* c = (uint8_t const*) cipher;
         for (; i < rest; ++i) {
             b0[i] = c[end + i];
         }
@@ -105,7 +105,7 @@ void ChaCha20Poly1305::polly(void const* cipher, int len) {
 
     // RFC 7539 requires 64-bit little-endian lengths of AAD and ciphertext.
     // In SSL/TLS usage here, aadLen is always < 128, so we only store it in one byte.
-    byte b1[16] = { aadLen, 0, 0, 0, 0, 0, 0, 0 };
+    uint8_t b1[16] = { aadLen, 0, 0, 0, 0, 0, 0, 0 };
     int l = len;
     for (int i = 8; i < 16; ++i) {
         b1[i] = l;

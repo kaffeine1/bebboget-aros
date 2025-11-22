@@ -59,21 +59,21 @@
 extern char* concat(const char *s0, ...);
 #endif
 
-static const byte CERT_OID_PATH[] = { 0x90, 0x90, 0x90, 0x86, 0 };
-static const byte ISSUER_PATH[] = { 0x90, 0x90, 0x10, 0x10, 0 };
-static const byte TIME_PATH[] = { 0x90, 0x90, 0x10, 0x10, 0x10, 0 };
-static const byte OWNER_PATH[] = { 0x90, 0x90, 0x10, 0x10, 0x10, 0x10, 0 };
-static const byte CERTPK_PATH[] = { 0x90, 0x90, 0x10, 0x10, 0x10, 0x10, 0x90, 0x83, 0 };
+static const uint8_t CERT_OID_PATH[] = { 0x90, 0x90, 0x90, 0x86, 0 };
+static const uint8_t ISSUER_PATH[] = { 0x90, 0x90, 0x10, 0x10, 0 };
+static const uint8_t TIME_PATH[] = { 0x90, 0x90, 0x10, 0x10, 0x10, 0 };
+static const uint8_t OWNER_PATH[] = { 0x90, 0x90, 0x10, 0x10, 0x10, 0x10, 0 };
+static const uint8_t CERTPK_PATH[] = { 0x90, 0x90, 0x10, 0x10, 0x10, 0x10, 0x90, 0x83, 0 };
 
-static const byte CERTSIGPATH_PATH[] = { 0x90, 0x10, 0x10, 0x83, 0 };
-static const byte CERTCONTENT_PATH[] = { 0x90, 0x10, 0 };
+static const uint8_t CERTSIGPATH_PATH[] = { 0x90, 0x10, 0x10, 0x83, 0 };
+static const uint8_t CERTCONTENT_PATH[] = { 0x90, 0x10, 0 };
 
-static const byte SIGNATUREHASH_PATH[] = { 0x90, 0x84, 0 };
+static const uint8_t SIGNATUREHASH_PATH[] = { 0x90, 0x84, 0 };
 
-static const byte ENCRYPTION_PATH[] = { 0x90, 0x90, 6, 0 };
-static const byte ENCRYPTION_PATH_CSR[] = { 0x90, 0x10, 0x90, 6, 0 };
+static const uint8_t ENCRYPTION_PATH[] = { 0x90, 0x90, 6, 0 };
+static const uint8_t ENCRYPTION_PATH_CSR[] = { 0x90, 0x10, 0x90, 6, 0 };
 
-static const byte CSRPK_PATH[] = { 0x90, 0x90, 0x10, 0x90, 0x83, 0 };
+static const uint8_t CSRPK_PATH[] = { 0x90, 0x90, 0x10, 0x90, 0x83, 0 };
 
 bytea const Pkcs6::nul = Asn1::makeASN1(bytea(), 5);
 bytea const Pkcs6::newSeq = Asn1::makeASN1(bytea(), 0x30);
@@ -117,7 +117,7 @@ bytea Pkcs6::getX509Exponent(bytez const &cert) {
 	if (b.size() == 0)
 		return b;
 
-	byte p2[] = { 0x90, 0x02, 0x82, 0 };
+	uint8_t p2[] = { 0x90, 0x02, 0x82, 0 };
 	return Asn1::getSeq(b, p2, b[0] == 0 ? 1 : 0);
 }
 
@@ -130,7 +130,7 @@ bytea Pkcs6::getX509Modulo(bytez const &cert) {
 	if (b.size() == 0)
 		return b;
 
-	byte p1[] = { 0x90, 0x82, 0 };
+	uint8_t p1[] = { 0x90, 0x82, 0 };
 	return Asn1::getSeq(b, p1, b[0] == 0 ? 1 : 0);
 }
 
@@ -187,12 +187,12 @@ bytea Pkcs6::prepareSignedContent(bytez const &sign, char const *hashName, unsig
 bytea Pkcs6::padSignedContent(bytez const &signedContent, int keyLength, int type) {
 	bytea tt;
 	tt.setSize(keyLength);
-	byte *t = tt.begin();
+	uint8_t *t = tt.begin();
 	t[0] = 0;
-	t[1] = (byte) type;
+	t[1] = (uint8_t) type;
 
 	for (int i = 2; i < tt.size() - signedContent.size(); ++i) {
-		t[i] = (byte) 0xff;
+		t[i] = (uint8_t) 0xff;
 	}
 	int off = tt.size() - signedContent.size() - 1;
 	t[off++] = 0;
@@ -205,7 +205,7 @@ static int equals(bytez const &a, bytez const &b) {
 }
 
 static bytea decodeRSA(bytea const &uu) {
-	byte const *u = uu.begin();
+	uint8_t const *u = uu.begin();
 	int i = 0;
 	while (i < uu.size() && u[i] == 0) {
 		++i;
@@ -236,14 +236,14 @@ bytea getValueFor(bytez const &data, bytez const &oid) {
 	return 0;
 }
 
-static const byte CERT_ATTR_PATH[] = { 0x90, 0x90, 0x10, 0x10, 0x10, 0x10, 0x10, 0x83, 0 };
+static const uint8_t CERT_ATTR_PATH[] = { 0x90, 0x90, 0x10, 0x10, 0x10, 0x10, 0x10, 0x83, 0 };
 
 char* readDns(bytea const &attrs) {
 	bytea dns = getValueFor(attrs, id_at_dns);
 //	_dump("dns", dns.begin(), dns.size());
-	byte const *end = dns.begin() + dns.size();
+	uint8_t const *end = dns.begin() + dns.size();
 	char *sdns = 0;
-	for (byte const *p = dns.begin(); p < end; ++p) {
+	for (uint8_t const *p = dns.begin(); p < end; ++p) {
 		if (*p == 0x82) {
 			++p;
 			int len = *p++;
@@ -403,7 +403,7 @@ void Pkcs6::verifyCertificates(mstl::vector<CertificateInfo> &cis, int verify) {
 					break;
 
 				MessageDigest *md = 0;
-				byte *k = coid.begin() + objectAlgorithmEcdsaWithSHA.size();
+				uint8_t *k = coid.begin() + objectAlgorithmEcdsaWithSHA.size();
 				switch (*k) {
 //				case 1: // SHA224
 //					break;
@@ -428,8 +428,8 @@ void Pkcs6::verifyCertificates(mstl::vector<CertificateInfo> &cis, int verify) {
 				_dump("signature", signature.begin(), signature.size());
 #endif
 				// get r and s from signature
-				byte *ss = signature.begin();
-				byte * se = ss + signature.size();
+				uint8_t *ss = signature.begin();
+				uint8_t *se = ss + signature.size();
 				while (*ss != 0x02 && ss < se)
 					++ss;
 

@@ -36,7 +36,7 @@
 DES3::~DES3() {}
 
 int DES3::setKey(const void *keyData_, unsigned keylen) {
-    byte *key = (byte *) keyData_;
+	uint8_t *key = (uint8_t *) keyData_;
     DES::setKey(key, 8);          // First DES key
     desB.setKey(key + 8, 8);      // Second DES key
     desC.setKey(key + 16, 8);     // Third DES key
@@ -44,8 +44,8 @@ int DES3::setKey(const void *keyData_, unsigned keylen) {
 }
 
 void DES3::encrypt(void *cipherText_, void const *clearText_) {
-    byte *cipherText = (byte *) cipherText_;
-    byte const *clearText = (byte const *) clearText_;
+	uint8_t *cipherText = (uint8_t *) cipherText_;
+	uint8_t const *clearText = (uint8_t const *) clearText_;
 
     // Triple-DES EDE sequence: Encrypt with A, Decrypt with B, Encrypt with C
     DES::encrypt(cipherText, clearText);
@@ -54,8 +54,8 @@ void DES3::encrypt(void *cipherText_, void const *clearText_) {
 }
 
 void DES3::decrypt(void *clearText_, void const *cipherText_) {
-    byte const *cipherText = (byte const *) cipherText_;
-    byte *clearText = (byte *) clearText_;
+	uint8_t const *cipherText = (uint8_t const *) cipherText_;
+	uint8_t *clearText = (uint8_t *) clearText_;
 
     // Triple-DES inverse sequence: Decrypt with C, Encrypt with B, Decrypt with A
     desC.decrypt(clearText, cipherText);

@@ -48,7 +48,7 @@
 class ChaCha20Poly1305 : public AeadBlockCipher {
     ChaCha20 cc;   ///< ChaCha20 cipher
     Poly1305 poly; ///< Poly1305 authenticator
-    byte aadLen;   ///< Length of AAD processed
+    uint8_t aadLen;   ///< Length of AAD processed
 
     /// Internal helper for Poly1305 update
     void polly(void const* cipher, int len);

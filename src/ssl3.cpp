@@ -782,7 +782,7 @@ int Ssl3::aeadEncrypt(uint8_t *b, unsigned len, int typ) {
 		// copy data since we append a byte, use the write buffer and an even address
 		writeBuffer.setSize(len + 36);
 		memcpy(writeBuffer.begin() + 32, b, len);
-		writeBuffer[32 + len] = (byte) typ;
+		writeBuffer[32 + len] = (uint8_t) typ;
 		inOff = 32;
 		b = writeBuffer.begin();
 		++len;
@@ -798,10 +798,10 @@ int Ssl3::aeadEncrypt(uint8_t *b, unsigned len, int typ) {
 	unsigned outLen = elen + 5; // header
 	writeBuffer.setSize(outLen);
 
-	byte *w = writeBuffer.begin();
-	w[1] = (byte) 3; // version
-	w[3] = (byte) (elen >> 8);
-	w[4] = (byte) (elen);
+	uint8_t *w = writeBuffer.begin();
+	w[1] = (uint8_t) 3; // version
+	w[3] = (uint8_t) (elen >> 8);
+	w[4] = (uint8_t) (elen);
 
 	int off;
 	if (hasEekPriv) {
@@ -811,7 +811,7 @@ int Ssl3::aeadEncrypt(uint8_t *b, unsigned len, int typ) {
 		unsigned long long wn = writenum > 0 ? writenum - 1 : 0;
 		wn ^= writenum++;
 		for (int i = 0; wn != 0 && i < writeIV.size(); ++i) {
-			writeIV[writeIV.size() - i - 1] ^= (byte) wn;
+			writeIV[writeIV.size() - i - 1] ^= (uint8_t) wn;
 			wn >>= 8;
 		}
 		gcm->init(writeIV.begin(), writeIV.size());
@@ -819,7 +819,7 @@ int Ssl3::aeadEncrypt(uint8_t *b, unsigned len, int typ) {
 
 		off = 5;
 	} else {
-		w[0] = (byte) typ;
+		w[0] = (uint8_t) typ;
 		w[2] = versionMinor;
 
 		w[5] = writeNonce[4];
@@ -847,9 +847,9 @@ int Ssl3::aeadEncrypt(uint8_t *b, unsigned len, int typ) {
 //				hi(len)   des Pakets - ohne expl iv
 //				lo(len)
 
-		writeAad[8] = (byte) typ;
-		writeAad[11] = (byte) (len >> 8);
-		writeAad[12] = (byte) len;
+		writeAad[8] = (uint8_t) typ;
+		writeAad[11] = (uint8_t) (len >> 8);
+		writeAad[12] = (uint8_t) len;
 		gcm->updateHash(writeAad, 13);
 #ifdef DEBUG
 		_dump("write aad: ", writeAad, 13);
@@ -885,7 +885,7 @@ _dump("AEAD packet: ",  writeBuffer.begin(),  outLen);
 	return outLen;
 }
 
-int Ssl3::rawwrite(byte *b, unsigned len, int typ) {
+int Ssl3::rawwrite(uint8_t *b, unsigned len, int typ) {
 	logme(L_DEBUG, "rawwrite len=%ld kind=%ld", len, typ);
 	if (isLogLevel(L_ULTRA)) {
 		_dump("rawrite", b, len);
@@ -909,7 +909,7 @@ int Ssl3::rawwrite(byte *b, unsigned len, int typ) {
 		randfill(tmp.begin(), offset);
 //		if (DEBUG.USE_TEST_DATA)
 //			for (int ii = 0; ii < offset; ++ii)
-//				tmp[ii] = (byte) ii;
+//				tmp[ii] = (uint8_t) ii;
 
 		memcpy(tmp.begin() + offset, b, len);
 
@@ -929,12 +929,12 @@ int Ssl3::rawwrite(byte *b, unsigned len, int typ) {
 		int outLen = useLen + 5;
 		writeBuffer.setSize(outLen);
 
-		byte *w = writeBuffer.begin();
-		w[0] = (byte) typ;
-		w[1] = (byte) 3; // version
+		uint8_t *w = writeBuffer.begin();
+		w[0] = (uint8_t) typ;
+		w[1] = (uint8_t) 3; // version
 		w[2] = versionMinor;
-		w[3] = (byte) ((useLen) >> 8);
-		w[4] = (byte) (useLen);
+		w[3] = (uint8_t) ((useLen) >> 8);
+		w[4] = (uint8_t) (useLen);
 
 		cryptWrite->encryptCBC(writeIV.begin(), w + offset, b, len);
 		cryptWrite->encryptCBC(writeIV.begin(), w + offset + len, hb.begin(), hashLen);
@@ -942,7 +942,7 @@ int Ssl3::rawwrite(byte *b, unsigned len, int typ) {
 	}
 
 	writeBuffer.setSize(5 + len + hashLen + blockSize);
-	byte *w = writeBuffer.begin();
+	uint8_t *w = writeBuffer.begin();
 	memcpy(w + 5, b, len);
 	memcpy(w + 5 + len, hb.begin(), hashLen);
 
@@ -957,16 +957,16 @@ int Ssl3::rawwrite(byte *b, unsigned len, int typ) {
 
 	int outLen = len + 5;
 
-	w[0] = (byte) typ;
-	w[1] = (byte) 3; // version
+	w[0] = (uint8_t) typ;
+	w[1] = (uint8_t) 3; // version
 	w[2] = versionMinor;
-	w[3] = (byte) (len >> 8);
-	w[4] = (byte) (len);
+	w[3] = (uint8_t) (len >> 8);
+	w[4] = (uint8_t) (len);
 
 	for (int i = 1; i <= pad; ++i) {
-		w[len - i + 4] = (byte) pad; // secureRnd.next(8);
+		w[len - i + 4] = (uint8_t) pad; // secureRnd.next(8);
 	}
-	w[len + 4] = (byte) pad;
+	w[len + 4] = (uint8_t) pad;
 #ifdef DEBUG
 	_dump("write", w + 5, len);
 #endif
@@ -985,7 +985,7 @@ void Ssl3::createTls13Keys(int isServer, MessageDigest *lastHsHash) {
 	delete readHash;
 	delete writeHash;
 
-	const byte *cs = ciphersuites[cipherIndex];
+	const uint8_t *cs = ciphersuites[cipherIndex];
 	int keyLen = cs[2];
 	if (cs[3] == BC_CHACHA20_POLY1305) {
 		cryptRead = new ChaCha20Poly1305();
@@ -1192,7 +1192,7 @@ void Ssl3::createKeys(int isServer) {
 	delete cryptRead;
 	delete cryptWrite;
 
-	const byte *cs = ciphersuites[cipherIndex];
+	const uint8_t *cs = ciphersuites[cipherIndex];
 	int keyLen = cs[2];
 	switch (cs[4]) {
 	case 1:
@@ -1282,7 +1282,7 @@ void Ssl3::createKeys(int isServer) {
 	}
 
 	{
-		byte *b = ba.begin();
+		uint8_t *b = ba.begin();
 
 		memcpy(isServer ? readSecret.begin() : writeSecret.begin(), b, hashLen);
 		b += hashLen;
@@ -1373,7 +1373,7 @@ void Ssl3::calc_hs_hash(void *to, MessageDigest *md, int len, bytez &sender) {
 	// masterSecret + pad2 + md5(handshake + sender + mastersecret + pad1)
 }
 
-bytea Ssl3::finishedHash(char const *cs, byte const *csData) {
+bytea Ssl3::finishedHash(char const *cs, uint8_t const *csData) {
 	// calculate the hashes for the client finished masterSecret
 	if (versionMinor != 0) {
 		// TLS
@@ -1475,7 +1475,7 @@ class SslOutputStream: public io::OutputStream {
 	/** the used SSL instance. */
 	Ssl3 *ssl;
 	/** buffer to write a single byte. */
-	byte one[1];
+	uint8_t one[1];
 
 public:
 	/**
@@ -1495,7 +1495,7 @@ public:
 		if (!ssl->isConnected())
 			return -1;
 		bytes(one, 1);
-		one[0] = (byte) b;
+		one[0] = (uint8_t) b;
 		return ssl->write(one);
 	}
 

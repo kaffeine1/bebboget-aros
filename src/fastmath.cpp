@@ -65,7 +65,7 @@
 #endif
 
 uinta FastMath32::byte2Int(bytez const &ssrc, int minLen) {
-    byte *src = ssrc.begin();
+	uint8_t *src = ssrc.begin();
     int i = 0;
     if (i == ssrc.size())
         i = 0;
@@ -98,16 +98,16 @@ bytea FastMath32::int2Byte(uint32_t const *ssrc, int slen, int dlen) {
     for (int i = 0, j = dst.size() - 1; i < slen; ++i) {
         uint32_t v = src[i];
         if (j < 0) break;
-        dst[j--] = (byte) v;
+        dst[j--] = (uint8_t) v;
         v >>= 8;
         if (j < 0) break;
-        dst[j--] = (byte) v;
+        dst[j--] = (uint8_t) v;
         v >>= 8;
         if (j < 0) break;
-        dst[j--] = (byte) v;
+        dst[j--] = (uint8_t) v;
         v >>= 8;
         if (j < 0) break;
-        dst[j--] = (byte) v;
+        dst[j--] = (uint8_t) v;
     }
     return dst;
 }

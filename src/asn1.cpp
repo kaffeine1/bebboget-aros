@@ -50,15 +50,15 @@
 #endif
 
 /** ASN.1 path to the public key inside a x.509 certificate. */
-byte Asn1::PK_PATH[] = { 0x90, 0x90, 0x10, 0x10, 0x10, 0x10, 0x90, 0x83, 0 };
+uint8_t Asn1::PK_PATH[] = { 0x90, 0x90, 0x10, 0x10, 0x10, 0x10, 0x90, 0x83, 0 };
 
 /** ASN.1 path to the public modulo inside the public key. */
-byte Asn1::MODULO_PATH[] = { 0x90, 0x82, 0 };
+uint8_t Asn1::MODULO_PATH[] = { 0x90, 0x82, 0 };
 
 /** ASN.1 path to the public exponent inside the public key. */
-byte Asn1::EXPONENT_PATH[] = { 0x90, 0x02, 0x82, 0 };
+uint8_t Asn1::EXPONENT_PATH[] = { 0x90, 0x02, 0x82, 0 };
 
-bytea Asn1::getSeq(bytez const &b, byte const *s, int off) {
+bytea Asn1::getSeq(bytez const &b, uint8_t const *s, int off) {
 	if (b.size() == 0 || s == 0 || *s == 0)
 		return bytea();
 
@@ -125,16 +125,16 @@ bytea Asn1::makeASN1(bytez const &b, int typ) {
 			++n;
 	}
 	bytea r(n + len);
-	r[0] = (byte) typ;
+	r[0] = (uint8_t) typ;
 	if (len > 0x7f) {
-		r[1] = (byte) (0x80 + n - 2);
+		r[1] = (uint8_t) (0x80 + n - 2);
 		unsigned i = n;
 		while (i > 2) {
-			r[--i] = (byte) len;
+			r[--i] = (uint8_t) len;
 			len = (unsigned) len >> 8;
 		}
 	} else
-		r[1] = (byte) len;
+		r[1] = (uint8_t) len;
 	if (typ == 3)
 		r[n++] = 0;
 	memcpy(r.begin() + n, b.begin(), b.size());
@@ -172,9 +172,9 @@ bytea Asn1::encodeOIDInteger(unsigned n) {
 		j = 1;
 
 	bytea bb(j);
-	byte *b = bb.begin();
+	uint8_t *b = bb.begin();
 	for (int k = 0; k < j; ++k) {
-		b[k] = (byte) ((0x7f & (n >> (j - k - 1) * 7)) | (k + 1 < j ? 0x80 : 0));
+		b[k] = (uint8_t) ((0x7f & (n >> (j - k - 1) * 7)) | (k + 1 < j ? 0x80 : 0));
 	}
 	return bb;
 }
@@ -183,7 +183,7 @@ bytea Asn1::string2Oid(char const *ss) {
 	char * s0 = strdup(ss);
 	char * s = s0;
 	bytea bb(strlen(s));
-	byte *b = bb.begin();
+	uint8_t *b = bb.begin();
 //	puts(s);
 
 	char *q = s;
@@ -232,7 +232,7 @@ bytea Asn1::string2Oid(char const *ss) {
 
 
 bytea Asn1::getData(bytez const & ba, int off) {
-	byte const * b = ba.begin();
+	uint8_t const * b = ba.begin();
 	// int start = off;
 	// int typ = b[off++];
 	++off;

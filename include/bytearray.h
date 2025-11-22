@@ -40,11 +40,8 @@
 #include <stdint.h>
 #include "ministl/vector.h"
 
-/// Single byte type
-typedef uint8_t byte;
-
 /// Dynamic array of bytes
-typedef mstl::vector<byte> bytea;
+typedef mstl::vector<uint8_t> bytea;
 
 /// Dynamic array of 32-bit integers
 typedef mstl::vector<uint32_t> bytei;
@@ -60,7 +57,7 @@ typedef mstl::__ptr_size bytez;
  *   -> declares a 64-byte buffer and wraps it in a bytez named buf.
  */
 #define bytes(n,s) \
-    byte __##n##__data[(s)]; \
+	uint8_t __##n##__data[(s)]; \
     bytez n(__##n##__data, (s))
 
 #endif // __BYTEARRAY_H__

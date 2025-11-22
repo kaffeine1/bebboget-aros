@@ -100,7 +100,7 @@ Ssl3Client::~Ssl3Client() {
 
 int Ssl3Client::newClientHello(char const *serverName) {
 	writeBuffer.reserve(512);
-	byte * b = writeBuffer.begin();
+	uint8_t * b = writeBuffer.begin();
 
 	int off = 9;
 	b[off++] = 3;
@@ -129,8 +129,8 @@ int Ssl3Client::newClientHello(char const *serverName) {
 	writeBuffer.setSize(off);
 
 	int extLen = off - extPos - 2;
-	b[extPos  ] = (byte)(extLen >> 8);
-	b[extPos+1] = (byte)(extLen);
+	b[extPos  ] = (uint8_t)(extLen >> 8);
+	b[extPos+1] = (uint8_t)(extLen);
 
 	addHandshakeHeader(1, b + 5, off - 9);
 	addMessageHeader(22, b + 0, off - 5);
@@ -141,7 +141,7 @@ int Ssl3Client::newClientHello(char const *serverName) {
 	return off;
 }
 
-int Ssl3Client::addKeyShare(byte * b, int off) {
+int Ssl3Client::addKeyShare(uint8_t * b, int off) {
 
 	b[off++] = 0;
 	b[off++] = 0x33;
@@ -166,8 +166,8 @@ int Ssl3Client::addKeyShare(byte * b, int off) {
 	return off;
 }
 
-int Ssl3Client::addSupportedVersions(byte * b, int off) {
-	static const byte supportedVersions[] = {
+int Ssl3Client::addSupportedVersions(uint8_t * b, int off) {
+	static const uint8_t supportedVersions[] = {
 			3, 4,
 			3, 3,
 	};
@@ -175,7 +175,7 @@ int Ssl3Client::addSupportedVersions(byte * b, int off) {
 	if (maxVersion < 3)
 		return off;
 
-	const byte * sv = supportedVersions;
+	const uint8_t * sv = supportedVersions;
 	int len = sizeof(supportedVersions);
 
 	if (maxVersion == 3) {
@@ -197,8 +197,8 @@ int Ssl3Client::addSupportedVersions(byte * b, int off) {
 	return off;
 }
 
-int Ssl3Client::addSignatureAlgorithms(byte * b, int off) {
-	static const byte signatureAlgs[] = {
+int Ssl3Client::addSignatureAlgorithms(uint8_t * b, int off) {
+	static const uint8_t signatureAlgs[] = {
 			4, 3,	// ecdsa_sha256
 				5, 3,	// ecdsa_sha384
 //				6, 3,	// ecdsa_sha512
@@ -235,8 +235,8 @@ int Ssl3Client::addSignatureAlgorithms(byte * b, int off) {
 	return off;
 }
 
-int Ssl3Client::addSupportedGroups(byte * b, int off) {
-	static const byte supportedGroups[] = {
+int Ssl3Client::addSupportedGroups(uint8_t * b, int off) {
+	static const uint8_t supportedGroups[] = {
 			0, 0x1d,	// x25519
 			0, 0x17,	// secp251r1
 			0, 0x18,	// secp384r1
@@ -266,7 +266,7 @@ int Ssl3Client::addSupportedGroups(byte * b, int off) {
 	return off;
 }
 
-int Ssl3Client::addServerNameExtension(byte * b, int off, char const * name) {
+int Ssl3Client::addServerNameExtension(uint8_t * b, int off, char const * name) {
 	if (name) {
 		int len = strlen(name);
 
@@ -291,13 +291,13 @@ int Ssl3Client::addServerNameExtension(byte * b, int off, char const * name) {
 	return off;
 }
 
-int Ssl3Client::addCompression(byte * b, int off) {
+int Ssl3Client::addCompression(uint8_t * b, int off) {
 	b[off++] = 1;
 	b[off++] = 0;
 	return off;
 }
 
-int Ssl3Client::addCipherTypes(byte * b, int off) {
+int Ssl3Client::addCipherTypes(uint8_t * b, int off) {
     int cipherPos = off;
     off += 2;
 
@@ -318,7 +318,7 @@ int Ssl3Client::addCipherTypes(byte * b, int off) {
     return off;
 }
 
-int Ssl3Client::addSessionId(byte * b, int off) {
+int Ssl3Client::addSessionId(uint8_t * b, int off) {
 	sessionId.setSize(32);
 	randfill(sessionId.begin(), 32);
 
@@ -327,7 +327,7 @@ int Ssl3Client::addSessionId(byte * b, int off) {
 	return off + 32;
 }
 
-int Ssl3Client::addClientRandom(byte * b, int off) {
+int Ssl3Client::addClientRandom(uint8_t * b, int off) {
 	clientRandom.setSize(32);
 	randfill(clientRandom.begin(), 32);
 	memcpy(b + off, clientRandom.begin(), 32);
@@ -582,7 +582,7 @@ void Ssl3Client::sendTls13ClientFinished() {
 	b[0] = 20;
 	b[1] = 0;
 	b[2] = 0;
-	b[3] = (byte) (verify.size());
+	b[3] = (uint8_t) (verify.size());
 	memcpy(b.begin() + 4, verify.begin(), verify.size());
 
 	updateHandshakeHashes(b.begin(), b.size());
@@ -604,7 +604,7 @@ bytea Ssl3Client::makeSignatureData13(MessageDigest * hsHash) {
 	return sigdata;
 }
 
-bytea Ssl3Client::makeSignatureData12(byte * b, int len) {
+bytea Ssl3Client::makeSignatureData12(uint8_t * b, int len) {
 	bytea r(clientRandom.size() + serverRandom.size() + len);
 	memcpy(r.begin(), clientRandom.begin(), clientRandom.size());
 	memcpy(r.begin() + clientRandom.size(), serverRandom.begin(), serverRandom.size());
@@ -615,7 +615,7 @@ bytea Ssl3Client::makeSignatureData12(byte * b, int len) {
 int Ssl3Client::verifySignature(bytez & ba, int off, MessageDigest *hsHash) {
 	logme(L_DEBUG, "verify signature");
 
-	byte * b = ba.begin();
+	uint8_t * b = ba.begin();
 	MessageDigest *md = 0;
 
 	bytea message = versionMinor == 4 ? makeSignatureData13(hsHash) : makeSignatureData12(b, off);
@@ -692,7 +692,7 @@ int Ssl3Client::verifySignature(bytez & ba, int off, MessageDigest *hsHash) {
 	if (len + off != ba.size())
 		return SSL_ERR_CORRUPT_PACKET;
 
-	byte * sigData = b + off;
+	uint8_t * sigData = b + off;
 
 	bytea &cert = certs[0];
 	bytea n = Pkcs6::getX509EcPub(cert);
@@ -742,7 +742,7 @@ int Ssl3Client::checkRSASignature(bytez &ba, int offset, MessageDigest *lastHsHa
 	int len;
 	int hash = 2;
 
-	byte *b = ba.begin();
+	uint8_t *b = ba.begin();
 
 //	if (DEBUG.ON)
 //		Misc.dump("rsa sig",  System.out, b, offset, b.length - offset);
@@ -825,7 +825,7 @@ int Ssl3Client::checkRSASignature(bytez &ba, int offset, MessageDigest *lastHsHa
 int Ssl3Client::readDheServerKey(bytea &ba, MessageDigest *lastHsHash) {
 	logme(L_DEBUG, "read DHE server key");
 
-	byte *b = ba.begin();
+	uint8_t *b = ba.begin();
 	int len = ((b[0] & 0xff) << 8) | (b[1] & 0xff);
 	if (len + 4 > ba.size())
 		return SSL_ERR_CORRUPT_PACKET;
@@ -858,7 +858,7 @@ int Ssl3Client::readDheServerKey(bytea &ba, MessageDigest *lastHsHash) {
 
 int Ssl3Client::readDhECServerKey(bytez &ba, MessageDigest *lastHsHash) {
 	logme(L_DEBUG, "read DHEC server key");
-	byte *b = ba.begin();
+	uint8_t *b = ba.begin();
 	if (b[0] != 3)
 		return SSL_ERR_CORRUPT_PACKET; //throw new IOException("expected named curve");
 	int curve = ((b[1] & 0xff) << 8) | (b[2] & 0xff);
@@ -893,7 +893,7 @@ int Ssl3Client::readDhECServerKey(bytez &ba, MessageDigest *lastHsHash) {
 
 int Ssl3Client::newEmptyClientCerts() {
 	writeBuffer.setSize(12);
-	byte *w = writeBuffer.begin();
+	uint8_t *w = writeBuffer.begin();
 	w[9] = 0;
 	w[10] = 0;
 	w[11] = 0;
@@ -927,9 +927,9 @@ int Ssl3Client::newClientKeyExchange3DhE() {
 	int dlen = y.size() + 2;
 	writeBuffer.setSize(dlen + 9);
 
-	byte *b = writeBuffer.begin();
-	b[9] = (byte) (y.size() >> 8);
-	b[10] = (byte) y.size();
+	uint8_t *b = writeBuffer.begin();
+	b[9] = (uint8_t) (y.size() >> 8);
+	b[10] = (uint8_t) y.size();
 	memcpy(b + 11, y.begin(), y.size());
 
 	addHandshakeHeader(16, b + 5, dlen);
@@ -942,12 +942,12 @@ int Ssl3Client::newClientKeyExchange3DHeC(int curve) {
 	logme(L_DEBUG, "DHEC client key exchange");
 	// create the premaster secret
 	int dlen;
-	byte *b = writeBuffer.begin();
+	uint8_t *b = writeBuffer.begin();
 	if (curve == 0x1d) { // X22519
 
 		bytes(clientPrivateKey, 32);
 
-		b[9] = (byte) 32;
+		b[9] = (uint8_t) 32;
 		fe_new_key_pair(b + 10, clientPrivateKey.begin());
 #ifdef FAKERAND
 		unhexlify(clientPrivateKey.begin(),
@@ -978,7 +978,7 @@ _dump("preMasterSecret", preMasterSecret.begin(), 32);
 		randfill(clientPrivateKey.begin(), 56);
 		preMasterSecret = ECMath::x448(clientPrivateKey.begin(), dhg.begin());
 
-		b[9] = (byte) 56;
+		b[9] = (uint8_t) 56;
 		ECMath::x448Pub(b + 10, clientPrivateKey.begin());
 		dlen = 57;
 	} else {
@@ -1004,7 +1004,7 @@ _dump("preMasterSecret", preMasterSecret.begin(), 32);
 		dlen = 2 * ylen + 2;
 		writeBuffer.setSize(dlen + 9);
 
-		b[9] = (byte) (1 + ylen * 2);
+		b[9] = (uint8_t) (1 + ylen * 2);
 		b[10] = 4; // uncompressed
 
 		memcpy(b + 11, pubx.begin(), ylen);
@@ -1069,7 +1069,7 @@ int Ssl3Client::newClientKeyExchange3RSA(mstl::vector<bytea> &v) {
 
 	int offset = versionMinor == 0 ? 9 : 11;
 
-	byte *b = writeBuffer.begin();
+	uint8_t *b = writeBuffer.begin();
 	if (dlen >= 0) {
 		// to short - insert leading zeros
 		int j = offset;
@@ -1084,8 +1084,8 @@ int Ssl3Client::newClientKeyExchange3RSA(mstl::vector<bytea> &v) {
 	dlen = encodedPMS.size();
 
 	if (versionMinor > 0) {
-		b[9] = (byte) (dlen >> 8);
-		b[10] = (byte) dlen;
+		b[9] = (uint8_t) (dlen >> 8);
+		b[10] = (uint8_t) dlen;
 		dlen += 2;
 	}
 
@@ -1264,11 +1264,11 @@ void Ssl3Client::sendSslClientFinished() {
 #endif
 
 
-	byte *b = ba.begin();
+	uint8_t *b = ba.begin();
 	b[0] = 20;
 	b[1] = 0;
 	b[2] = 0;
-	b[3] = (byte) (ba.size() - 4);
+	b[3] = (uint8_t) (ba.size() - 4);
 
 	updateHandshakeHashes(b, ba.size());
 

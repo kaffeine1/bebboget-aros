@@ -57,7 +57,7 @@ void ChaCha20::encrypt(void* cipherText, void const* clearText) {
 }
 
 int ChaCha20::setKey(void const* key, unsigned keyLen) {
-    byte const* k = (byte const*) key;
+	uint8_t const* k = (uint8_t const*) key;
     state[0] = 0x61707865;
     state[1] = 0x3320646e;
     state[2] = 0x79622d32;
@@ -79,7 +79,7 @@ int ChaCha20::setKey(void const* key, unsigned keyLen) {
 }
 
 int ChaCha20::setNonce(void const* nonce, unsigned nonceLen) {
-    byte const* n = (byte const*) nonce;
+	uint8_t const* n = (uint8_t const*) nonce;
     if (nonceLen != 12)
         return false;
 
@@ -139,14 +139,14 @@ void ChaCha20::nextBlock() {
 }
 
 union IB {
-    byte* b;
+	uint8_t* b;
     uint32_t* i;
 };
 
 void ChaCha20::chacha(void* out, void const* in, int length) {
     int i = 0;
-    IB to; to.b = (byte*) out;
-    IB from; from.b = (byte*) in;
+    IB to; to.b = (uint8_t*) out;
+    IB from; from.b = (uint8_t*) in;
     while (i < length) {
         if (pos == 64) {
             nextBlock();

@@ -45,7 +45,7 @@
 class ChaCha20 : public BlockCipher {
     friend class ChaCha20Poly1305;
     uint32_t state[16]; ///< Internal state
-    byte stream[64];    ///< Current keystream block
+    uint8_t stream[64];    ///< Current keystream block
     int pos;            ///< Position within stream
 public:
     /// Constructor initializes position to end of stream
@@ -74,7 +74,7 @@ public:
     void nextBlock();
 
     /// Access current keystream
-    inline byte const* getStream() const { return stream; }
+    inline uint8_t const* getStream() const { return stream; }
 
     /// Reset counter to initial value
     void zeroCounter() { state[12] = 0xffffffff; }

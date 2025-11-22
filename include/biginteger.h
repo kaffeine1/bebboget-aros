@@ -60,7 +60,7 @@ public:
     BigInteger(unsigned int i);
 
     /// Construct from sign and byte array
-    BigInteger(short signum_, byte const* ba, int len);
+    BigInteger(short signum_, uint8_t const* ba, int len);
 
     /// Construct from sign and uinta container
     BigInteger(short signum_, uinta const& no);
