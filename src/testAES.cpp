@@ -145,7 +145,6 @@ int testAESGCM() {
 	uint8_t hash[16];
 	gcm.calcHash(hash);
 
-
 	return assertArrayEquals(outex, cipher, sizeof(outex)) &
 			assertArrayEquals(hashex, hash, sizeof(hashex));
 }

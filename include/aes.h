@@ -64,13 +64,13 @@ public:
 
 private:
     short rounds;   ///< Number of AES rounds (10, 12, or 14 depending on key size)
-    bytea keyData;  ///< Expanded key storage
+    uint8_t keyData[(14* 2 + 1) * sizeof(DB)];  ///< Expanded key storage
     DB*   ckey;     ///< Cipher round keys
     DB*   invckey;  ///< Inverse cipher round keys
 
 public:
     /// Constructor initializes members to safe defaults
-    inline AES(int dummy = 0) : rounds(0), ckey(0), invckey(0) {}
+    AES(int dummy = 0);
 
     /// Destructor
     virtual ~AES();

@@ -3,9 +3,8 @@ Author:       s.franke@bebbosoft.de
 Uploader:     s.franke@bebbosoft.de
 Architecture: m68k-amigaos
 Type:         comm/net
-Version:      1.9
+Version:      1.10
 Required:     bsdsocket.library (e.g AmiTCP)
-Replaces:     amigaget
 
 ===============================================================================
 NAME
@@ -22,9 +21,9 @@ Expected speed, tested with a 1217kB zip file on github.com
 tested with WinUAE using original speed, no JIT.
 
 (in kB/s)                68000        68020
-bebboget00                 4.8         28.4
+bebboget00                 4.9         28.9
 bebboget00 --nochpo        5.7         32.2
-bebboget                               49.4
+bebboget                               51.5
 bebboget   --nochpo                    39.8         
 
 Note that the speed also depends on the server!
@@ -48,8 +47,8 @@ PROGRAMS
    bebboget
 ===============
 
-$VER: 1.9  (21.11.2025) written by Stefan "Bebbo" Franke
-USAGE: bebboget 1.9  [options] <url>
+$VER: 1.10 (23.11.2025) written by Stefan "Bebbo" Franke
+USAGE: bebboget 1.10 [options] <url>
     -?            display this help
     -C            print the outgoing headers
     -D <dir>      the directory to write to (must exist)
@@ -158,7 +157,11 @@ SOFTWARE, EVEN IF I HAVE ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
 ===============================================================================
 HISTORY
 
-bebboget V1.9 (20.11.2025)
+bebboget V1.10 (23.11.2025)
+* consolidating code with bebbossh
+* some speed gain with chacha20_poly1305
+
+bebboget V1.9 (21.11.2025)
 * name changed to bebboget
 * license change to GPLv3 (or later)
   code derived from supercop is still public domain

@@ -237,23 +237,39 @@ int AES::setKey(void const *key, unsigned keylen) {
 #define roty rotl
 #endif
 
-	keyData.setSize((rounds * 2 + 1) * sizeof(DB));
-	ckey = (DB*)keyData.begin();
+	ckey = (DB*)keyData;
 	invckey = &ckey[rounds];
 
 	// prepare cipher keys
 	uint32_t * buffer32 = &ckey->d[0];
-	memcpy(buffer32, key, keylen);
 
-	const auto nk = keylen / 4;
-    for ( size_t i = nk; i != 4 * rounds + 4; ++i ) {
-        auto temp = (buffer32[i - 1]);
-        if ( i % nk == 0 ) {
-            temp = subWord(rotx(temp, 8)) ^ rCon[i / nk - 1];
-        } else if ( nk > 6 && i % nk == 4 ) {
+	// copy full 32-bit words
+	const uint32_t* src32 = static_cast<const uint32_t*>(key);
+	unsigned words = keylen / 4;
+	for (unsigned i = 0; i < words; ++i) {
+	    buffer32[i] = src32[i];
+	}
+
+	// keylen 16/24/32 -> nk 4/6/8
+    const unsigned nk = keylen >> 2;          // nk = 4, 6, or 8
+    const unsigned end = 4 * rounds + 4;
+
+    unsigned ink = 0;                         // position within nk
+    unsigned rci = 0;                         // index into rCon
+
+    for (unsigned i = nk; i < end; ++i) {
+        uint32_t temp = buffer32[i - 1];
+
+        if (ink == 0) {
+            temp = subWord(rotx(temp, 8)) ^ rCon[rci++];
+        } else if (nk > 6 && ink == 4) {
             temp = subWord(temp);
         }
-        buffer32[i] = buffer32[i - nk] ^ (temp);
+
+        buffer32[i] = buffer32[i - nk] ^ temp;
+
+        // advance ink, wrap at nk
+        if (++ink == nk) ink = 0;
     }
 
     // prepare inverse cipher keys
@@ -270,7 +286,7 @@ int AES::setKey(void const *key, unsigned keylen) {
 }
 
 #ifdef __AMIGA__
-__attribute((section(".text.once")))
+__attribute((section(".text")))
 #endif
 uint32_t T1[256], T2[256], T3[256], T4[256],
 		 Tinv1[256], Tinv2[256], Tinv3[256], Tinv4[256];
@@ -324,7 +340,7 @@ extern "C" void initMixTables() {
 }
 
 // Static initializer ensures T-tables are built before first AES use
-static struct __ {	__() {initMixTables();}} __;
+static struct __ {	__() { initMixTables(); }} __;
 
 /**
  * Encrypt a single 128-bit block using AES.
@@ -461,6 +477,8 @@ void AES::decrypt(void* output_, const void* input_) {
 	PACK(12, 9, 6, 3, INVSBOX, temp);
 	*output++ = t ^ *rk++;
 }
+
+AES::AES(int dummy) : rounds(0), ckey(0), invckey(0) {}
 
 /**
  * AES destructor (no dynamic cleanup required).

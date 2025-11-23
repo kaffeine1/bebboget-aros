@@ -26,11 +26,12 @@
  *  - ChaCha20Poly1305: AEAD wrapper with AAD support and authentication
  *
  * Notes:
+ *  - Does work with SSL and SSH ob 68000 since alignment is ok.
+ *    For general usage on 68000 change XOR to bytes!
  *  - Optimized for 32-bit word operations
  *  - Contributions must preserve author attribution and GPL licensing
  * ----------------------------------------------------------------------
  */
-
 #include <string.h>
 #include "bc.h"
 #include "chacha20.h"
@@ -42,6 +43,7 @@
 #include <test.h>
 
 // ---------------- ChaCha20 ----------------
+ChaCha20::ChaCha20(): pos(64) {}
 
 ChaCha20::~ChaCha20() {}
 
@@ -57,7 +59,7 @@ void ChaCha20::encrypt(void* cipherText, void const* clearText) {
 }
 
 int ChaCha20::setKey(void const* key, unsigned keyLen) {
-	uint8_t const* k = (uint8_t const*) key;
+    uint8_t const* k = (uint8_t const*) key;
     state[0] = 0x61707865;
     state[1] = 0x3320646e;
     state[2] = 0x79622d32;
@@ -79,7 +81,7 @@ int ChaCha20::setKey(void const* key, unsigned keyLen) {
 }
 
 int ChaCha20::setNonce(void const* nonce, unsigned nonceLen) {
-	uint8_t const* n = (uint8_t const*) nonce;
+    uint8_t const* n = (uint8_t const*) nonce;
     if (nonceLen != 12)
         return false;
 
@@ -89,6 +91,7 @@ int ChaCha20::setNonce(void const* nonce, unsigned nonceLen) {
                                ((uint32_t) n[i + 2] << 16) |
                                ((uint32_t) n[i + 3] << 24);
     }
+    pos = 64;
     return true;
 }
 
@@ -139,32 +142,71 @@ void ChaCha20::nextBlock() {
 }
 
 union IB {
-	uint8_t* b;
+    uint8_t* b;
     uint32_t* i;
 };
 
+union CIB {
+    const uint8_t* b;
+    const uint32_t* i;
+};
+
 void ChaCha20::chacha(void* out, void const* in, int length) {
-    int i = 0;
-    IB to; to.b = (uint8_t*) out;
-    IB from; from.b = (uint8_t*) in;
-    while (i < length) {
-        if (pos == 64) {
-            nextBlock();
-        }
+	if (length == 0) return;
+
+    IB to;   to.b   = static_cast<uint8_t*>(out);
+    CIB from; from.b = static_cast<const uint8_t*>(in);
+
+    // --- Front part: consume leftover keystream bytes if pos != 0 ---
+    if (pos != 64) {
         IB s; s.b = this->stream + pos;
-        int count = MIN(64 - pos, length);
-        length -= count;
-#if 1 // optimized for 68020
-        while (count > 3) {
+
+        int front = MIN(64 - pos, length);
+        length -= front;
+
+        for (int j = 0; j < front >> 2; ++j) {
             *to.i++ = *from.i++ ^ *s.i++;
-            count -= 4;
         }
-#endif
-        while (count > 0) {
+    	front &= 3;
+        while (front > 0) {
             *to.b++ = *from.b++ ^ *s.b++;
-            --count;
+            --front;
         }
+
         pos = s.b - this->stream;
+        if (length == 0)
+        	return;
+    }
+    // if we reach here: pos == 64
+
+    // --- Full blocks ---
+    int fullBlocks = length / 64;
+    for (int block = 0; block < fullBlocks; ++block) {
+        nextBlock(); // always start fresh block
+        IB s; s.b = this->stream;
+
+        for (int j = 0; j < 16; ++j) {
+            *to.i++ = *from.i++ ^ *s.i++;
+        }
+    }
+
+    // --- Tail (<64 bytes) ---
+	length &= 63;
+    if (length > 0) {
+        nextBlock();
+        IB s; s.b = this->stream;
+
+        for (int j = 0; j < length >> 2; ++j) {
+            *to.i++ = *from.i++ ^ *s.i++;
+        }
+        length &= 3;
+        while (length > 0) {
+            *to.b++ = *from.b++ ^ *s.b++;
+            --length;
+        }
+
+        pos = s.b - this->stream;
+    } else {
+    	pos = 64;
     }
 }
-

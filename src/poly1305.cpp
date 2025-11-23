@@ -50,24 +50,39 @@ int Poly1305::setKey(void const* k, int klen) {
 #ifdef DEBUG
     _dump("poly key", k, klen);
 #endif
-    r[0] = 0x0fffffff & (((uint32_t) b[0]) | ((uint32_t) b[1] << 8) | ((uint32_t) b[2] << 16) | ((uint32_t) b[3] << 24));
-    b += 4;
-    r[1] = 0x0ffffffc & (((uint32_t) b[0]) | ((uint32_t) b[1] << 8) | ((uint32_t) b[2] << 16) | ((uint32_t) b[3] << 24));
-    b += 4;
-    r[2] = 0x0ffffffc & (((uint32_t) b[0]) | ((uint32_t) b[1] << 8) | ((uint32_t) b[2] << 16) | ((uint32_t) b[3] << 24));
-    b += 4;
-    r[3] = 0x0ffffffc & (((uint32_t) b[0]) | ((uint32_t) b[1] << 8) | ((uint32_t) b[2] << 16) | ((uint32_t) b[3] << 24));
-    b += 4;
-    r[4] = 0;
-    s[0] = ((uint32_t) b[0]) | ((uint32_t) b[1] << 8) | ((uint32_t) b[2] << 16) | ((uint32_t) b[3] << 24);
-    b += 4;
-    s[1] = ((uint32_t) b[0]) | ((uint32_t) b[1] << 8) | ((uint32_t) b[2] << 16) | ((uint32_t) b[3] << 24);
-    b += 4;
-    s[2] = ((uint32_t) b[0]) | ((uint32_t) b[1] << 8) | ((uint32_t) b[2] << 16) | ((uint32_t) b[3] << 24);
-    b += 4;
-    s[3] = ((uint32_t) b[0]) | ((uint32_t) b[1] << 8) | ((uint32_t) b[2] << 16) | ((uint32_t) b[3] << 24);
+#if (BYTE_ORDER == BIG_ENDIAN)
+    // Treat r and s as byte arrays (20 and 16 bytes via uint32_t views)
+    uint8_t* rr = reinterpret_cast<uint8_t*>(r);
+    uint8_t* ss = reinterpret_cast<uint8_t*>(s);
 
-    memset(a, 0, sizeof(a));
+    rr[0]  = 0x0f & b[3];  rr[1]  = b[2];  rr[2]  = b[1];  rr[3]  = b[0];
+    rr[4]  = 0x0f & b[7];  rr[5]  = b[6];  rr[6]  = b[5];  rr[7]  = 0xfc & b[4];
+    rr[8]  = 0x0f & b[11]; rr[9]  = b[10]; rr[10] = b[9];  rr[11] = 0xfc & b[8];
+    rr[12] = 0x0f & b[15]; rr[13] = b[14]; rr[14] = b[13]; rr[15] = 0xfc & b[12];
+
+    r[4] = 0;
+
+    ss[0]  = b[19]; ss[1]  = b[18]; ss[2]  = b[17]; ss[3]  = b[16];
+    ss[4]  = b[23]; ss[5]  = b[22]; ss[6]  = b[21]; ss[7]  = b[20];
+    ss[8]  = b[27]; ss[9]  = b[26]; ss[10] = b[25]; ss[11] = b[24];
+    ss[12] = b[31]; ss[13] = b[30]; ss[14] = b[29]; ss[15] = b[28];
+#else
+    // Little-endian: direct word loads
+    const uint32_t* w = reinterpret_cast<const uint32_t*>(b);
+
+    r[0] = w[0] & 0x0fffffff;
+    r[1] = w[1] & 0x0ffffffc;
+    r[2] = w[2] & 0x0ffffffc;
+    r[3] = w[3] & 0x0ffffffc;
+    r[4] = 0;
+
+    s[0] = w[4];
+    s[1] = w[5];
+    s[2] = w[6];
+    s[3] = w[7];
+#endif
+
+    for (int i = 0; i < 10; ++i) a[i] = 0;
     return true;
 }
 
@@ -77,7 +92,7 @@ extern void addmodmul(uint32_t* a, uint32_t const* n, uint32_t const* r);
 };
 #else
 
-#if __AMIGA__
+#ifdef __AMIGA__
 extern "C" void mod5(uint32_t* t);
 #else
 static inline void mod5(uint32_t* t) {
@@ -130,21 +145,29 @@ void Poly1305::update(void const* d, int len) {
 #ifdef DEBUG
     _dump("poly update", d, len);
 #endif
-    while (len > 16) {
-        uint32_t n[5] = {
-            ((uint32_t) b[0]) | ((uint32_t) b[1] << 8) | ((uint32_t) b[2] << 16) | ((uint32_t) b[3] << 24),
-            ((uint32_t) b[4]) | ((uint32_t) b[5] << 8) | ((uint32_t) b[6] << 16) | ((uint32_t) b[7] << 24),
-            ((uint32_t) b[8]) | ((uint32_t) b[9] << 8) | ((uint32_t) b[10] << 16) | ((uint32_t) b[11] << 24),
-            ((uint32_t) b[12]) | ((uint32_t) b[13] << 8) | ((uint32_t) b[14] << 16) | ((uint32_t) b[15] << 24),
-            1
-        };
+#if (BYTE_ORDER == BIG_ENDIAN)
+    uint8_t bn[20]; // 16 data bytes + 4 marker bytes
+    // marker word = 1 for full block
+    *(uint32_t*)&bn[16] = 0x1;
+    uint32_t* n = reinterpret_cast<uint32_t*>(bn);
+#else
+    uint32_t n[5];
+#endif
+    for (int nn = len / 16; nn > 0; --nn) {
+#if (BYTE_ORDER == BIG_ENDIAN)
+        // pack 16 bytes into 4 words
+        bn[0]  = b[3];  bn[1]  = b[2];  bn[2]  = b[1];  bn[3]  = b[0];
+        bn[4]  = b[7];  bn[5]  = b[6];  bn[6]  = b[5];  bn[7]  = b[4];
+        bn[8]  = b[11]; bn[9]  = b[10]; bn[10] = b[9];  bn[11] = b[8];
+        bn[12] = b[15]; bn[13] = b[14]; bn[14] = b[13]; bn[15] = b[12];
         addmodmul(a, n, r);
-        len -= 16;
+#else
+        addmodmul(a, (uint32_t *)b, r);
+#endif
         b += 16;
     }
-
-    while (len > 0) {
-        uint32_t n[5];
+    len &= 15;
+    if (len > 0) {
         for (int i = 0; i < 4; ++i) {
             if (len >= 4) {
                 n[i] = ((uint32_t) b[0]) | ((uint32_t) b[1] << 8) | ((uint32_t) b[2] << 16) | ((uint32_t) b[3] << 24);
@@ -162,7 +185,6 @@ void Poly1305::update(void const* d, int len) {
         }
         n[4] = (len >= 0) ? 1 : 0;
         addmodmul(a, n, r);
-        len -= 16;
     }
 }
 

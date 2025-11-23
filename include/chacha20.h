@@ -49,7 +49,7 @@ class ChaCha20 : public BlockCipher {
     int pos;            ///< Position within stream
 public:
     /// Constructor initializes position to end of stream
-    ChaCha20() : pos(64) {}
+    ChaCha20();
     virtual ~ChaCha20();
 
     /// Decrypt data using ChaCha20
