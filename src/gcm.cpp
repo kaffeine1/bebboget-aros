@@ -211,7 +211,7 @@ const uint8_t GCM::R[256][2] = {
  * @param bc
  *            the used block cipher.
  */
-GCM::GCM(AES *_bc) :
+GCM::GCM(BlockCipher *_bc) :
 		bc(_bc), _m(0), dataLen(0), aadLen(0) {
 }
 
@@ -517,13 +517,14 @@ _dump("hash2", nonceCounter, 16);
 void GCM::updateHash(void const *_aad, int len) {
 	uint8_t const *aad = (uint8_t const *)_aad;
 	aadLen += len;
-	while ( len >= 16) {
+	for (int i = 0; i < len / 16; ++i) {
 		len -= 16;
 		xorInplace16(hash, aad);
 		mulHInplace(hash, *_m);
 		aad += 16;
 	}
 	// add partial
+	len &= 15;
 	if (len > 0) {
 		xorInplace(hash, aad, len);
 		mulHInplace(hash, *_m);

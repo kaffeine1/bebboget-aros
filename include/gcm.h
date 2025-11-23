@@ -44,7 +44,7 @@ class GCM : public AeadBlockCipher {
     static const uint8_t R[256][2];
 
     /** The underlying AES block cipher. */
-    AES* bc;
+    BlockCipher* bc;
 
     /** The lookup table M to speed up multiplications. */
     gcm_m_array* _m;
@@ -72,7 +72,7 @@ class GCM : public AeadBlockCipher {
 
 public:
     /// Construct GCM with AES block cipher
-    explicit GCM(AES* _bc);
+    explicit GCM(BlockCipher* _bc);
 
     /// Virtual destructor
     virtual ~GCM();
