@@ -80,8 +80,8 @@ LIB_SOURCES = $(EXTRA_LIB_SOURCES) bg.cpp \
 
 LIB_OBJECTS = $(patsubst %.asm,$(OUTDIR)/%.o, $(patsubst %.cpp,$(OUTDIR)/%.o, $(patsubst %.c,$(OUTDIR)/%.o,$(LIB_SOURCES))))
 
-amigaget_SOURCES = bebboget.cpp 
-amigaget_OBJECTS = $(patsubst %.cpp,$(OUTDIR)/%.o, $(patsubst %.c,$(OUTDIR)/%.o,$(amigaget_SOURCES)))
+BEBBOGET_SOURCES = bebboget.cpp 
+BEBBOGET_OBJECTS = $(patsubst %.cpp,$(OUTDIR)/%.o, $(patsubst %.c,$(OUTDIR)/%.o,$(BEBBOGET_SOURCES)))
 
 installcerts_SOURCES = installcerts.cpp 
 installcerts_OBJECTS = $(patsubst %.cpp,$(OUTDIR)/%.o, $(patsubst %.c,$(OUTDIR)/%.o,$(installcerts_SOURCES)))
@@ -106,7 +106,7 @@ pre:
 	echo $(LIB_OBJECTS)
 	mkdir -p $(OUTDIR)
 
-$(OUTDIR)/bebboget: $(amigaget_OBJECTS) $(TESTS) $(OUTDIR)/libbebboget.a
+$(OUTDIR)/bebboget: $(BEBBOGET_OBJECTS) $(TESTS) $(OUTDIR)/libbebboget.a
 	$(CC) $(CFLAGS) $(C++FLAGS) $(LDFLAGS) $(filter-out $(OUTDIR)/test%,$(filter-out %.$(LIB_EXT),$^)) $(LINKME) $(LIBS) -o $@
 
 $(OUTDIR)/installcerts: $(installcerts_OBJECTS) $(TESTS) $(OUTDIR)/libbebboget.a

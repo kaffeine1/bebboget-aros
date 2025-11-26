@@ -21,26 +21,26 @@
  *          and utility routines for secure communication.
  *
  * Features:
- *  - Version reporting (ag_version)
- *  - Random data generation (ag_randfill)
+ *  - Version reporting (bg_version)
+ *  - Random data generation (bg_randfill)
  *  - SSL client lifecycle management (open, connect, send, recv, close)
  *  - Certificate verification and cipher configuration
  *  - SHA-256 hashing utility
  *
  * Curl backend usage:
- *  - The ag_* functions map directly to curl's vtls abstraction layer:
- *      * ag_ssl_open / ag_ssl_close -> session lifecycle
- *      * ag_ssl_connect            -> TLS handshake
- *      * ag_ssl_send / ag_ssl_recv -> encrypted I/O
- *      * ag_ssl_available          -> input stream availability
- *      * ag_ssl_verify             -> certificate chain validation
- *      * ag_ssl_set_ciphers        -> cipher suite configuration
+ *  - The bg_* functions map directly to curl's vtls abstraction layer:
+ *      * bg_ssl_open / bg_ssl_close -> session lifecycle
+ *      * bg_ssl_connect            -> TLS handshake
+ *      * bg_ssl_send / bg_ssl_recv -> encrypted I/O
+ *      * bg_ssl_available          -> input stream availability
+ *      * bg_ssl_verify             -> certificate chain validation
+ *      * bg_ssl_set_ciphers        -> cipher suite configuration
  *  - This makes bebboget suitable as a drop-in backend for curl,
  *    requiring only a thin glue layer in curl's vtls module.
  *
  * Notes:
  *  - All functions are exposed with C linkage and __stdargs for Amiga ABI.
- *  - Caller is responsible for proper resource cleanup via ag_ssl_close().
+ *  - Caller is responsible for proper resource cleanup via bg_ssl_close().
  *  - Contributions must preserve author attribution and GPL licensing.
  * ----------------------------------------------------------------------
  */
@@ -63,7 +63,7 @@
  *
  * @return char const* Pointer to a constant string containing the library version.
  */
-extern "C" __stdargs char const * ag_version() {
+extern "C" __stdargs char const * bg_version() {
     return "bebboget " __V__;
 }
 
@@ -76,7 +76,7 @@ extern "C" __stdargs char const * ag_version() {
  * @param[in] to Pointer to the destination buffer where random bytes will be written.
  * @param[in] length Number of bytes to fill in the buffer.
  */
-extern "C" __stdargs void ag_randfill(void * to, int length) {
+extern "C" __stdargs void bg_randfill(void * to, int length) {
     randfill(to, length);
 }
 
@@ -87,12 +87,12 @@ extern "C" __stdargs void ag_randfill(void * to, int length) {
  * prepares the EEK (engine environment key), and initializes the client for use. This function should
  * be called before any connection or data transmission operations.
  *
- * The returned pointer must be passed to ag_ssl_close() when finished to clean up resources properly.
+ * The returned pointer must be passed to bg_ssl_close() when finished to clean up resources properly.
  *
  * @param[in] sloppy If true, enables additional debug logging during SSL handshake (default: false)
  * @return void* Pointer to the initialized SSL client instance, or nullptr if initialization fails.
  */
-extern "C" __stdargs void * ag_ssl_open(int sloppy) {
+extern "C" __stdargs void * bg_ssl_open(int sloppy) {
     setLogLevel(L_ERROR);
     auto s = new Ssl3Client();
     if (s) {
@@ -112,7 +112,7 @@ extern "C" __stdargs void * ag_ssl_open(int sloppy) {
  *
  * @param[in] ssl Pointer to the SSL client instance to close, must not be null.
  */
-extern "C" __stdargs void ag_ssl_close(void * ssl) {
+extern "C" __stdargs void bg_ssl_close(void * ssl) {
     if (ssl) {
         delete (Ssl3Client *) ssl;
     }
@@ -122,9 +122,9 @@ extern "C" __stdargs void ag_ssl_close(void * ssl) {
  * @brief Establishes an SSL/TLS connection using a prepared client instance and socket descriptor.
  *
  * Initiates the SSL handshake process with the provided socket and remote host address. This function must
- * be called after ag_ssl_open() and before any data transmission operations (ag_ssl_send or ag_ssl_recv).
+ * be called after bg_ssl_open() and before any data transmission operations (bg_ssl_send or bg_ssl_recv).
  *
- * The ssl parameter refers to an Ssl3Client object that has been prepared by ag_ssl_open(). It is expected
+ * The ssl parameter refers to an Ssl3Client object that has been prepared by bg_ssl_open(). It is expected
  * that this client instance already exists and is valid.
  *
  * @param[in] ssl Pointer to the SSL client instance. Must not be null.
@@ -133,7 +133,7 @@ extern "C" __stdargs void ag_ssl_close(void * ssl) {
 interface).
  * @return int Returns 0 on success, -1 on failure or error during handshake.
  */
-extern "C" __stdargs int ag_ssl_connect(void *ssl, int sock, char const * hostname) {
+extern "C" __stdargs int bg_ssl_connect(void *ssl, int sock, char const * hostname) {
     if (ssl) {
         auto ssl3 = (Ssl3Client *) ssl;
         return ssl3->connect(sock, hostname);
@@ -145,9 +145,9 @@ extern "C" __stdargs int ag_ssl_connect(void *ssl, int sock, char const * hostna
  * @brief Sends data over an established SSL/TLS connection.
  *
  * Writes the provided buffer of bytes to the SSL output stream. This function should only be used after a
- * successful call to ag_ssl_connect().
+ * successful call to bg_ssl_connect().
  *
- * The ssl parameter refers to an Ssl3Client object that has been connected (ag_ssl_connect() was called).
+ * The ssl parameter refers to an Ssl3Client object that has been connected (bg_ssl_connect() was called).
  * It is expected that this client instance already exists and is valid.
  *
  * @param[in] ssl Pointer to the SSL client instance. Must not be null.
@@ -155,7 +155,7 @@ extern "C" __stdargs int ag_ssl_connect(void *ssl, int sock, char const * hostna
  * @param[in] len Length of the data buffer in bytes.
  * @return int Returns number of bytes sent on success, -1 on error or if connection is closed.
  */
-extern "C" __stdargs int ag_ssl_send(void *ssl, char const * data, int len) {
+extern "C" __stdargs int bg_ssl_send(void *ssl, char const * data, int len) {
     if (ssl) {
         auto ssl3 = (Ssl3Client *) ssl;
         return ssl3->getOutputStream()->write(data, len);
@@ -167,9 +167,9 @@ extern "C" __stdargs int ag_ssl_send(void *ssl, char const * data, int len) {
  * @brief Receives data from an SSL/TLS connection.
  *
  * Reads available bytes from the SSL input stream into the provided buffer. This function should be called
- * periodically after a successful call to ag_ssl_connect() and when there is expected incoming data.
+ * periodically after a successful call to bg_ssl_connect() and when there is expected incoming data.
  *
- * The ssl parameter refers to an Ssl3Client object that has been connected (ag_ssl_connect() was called).
+ * The ssl parameter refers to an Ssl3Client object that has been connected (bg_ssl_connect() was called).
  * It is expected that this client instance already exists and is valid.
  *
  * @param[in] ssl Pointer to the SSL client instance. Must not be null.
@@ -177,7 +177,7 @@ extern "C" __stdargs int ag_ssl_send(void *ssl, char const * data, int len) {
  * @param[in] len Size of the buffer in bytes.
  * @return int Returns number of bytes read on success, -1 on error or if no data is available.
  */
-extern "C" __stdargs int ag_ssl_recv(void *ssl, char * data, int len) {
+extern "C" __stdargs int bg_ssl_recv(void *ssl, char * data, int len) {
     if (ssl) {
         auto ssl3 = (Ssl3Client *) ssl;
         return ssl3->getInputStream()->read(data, len);
@@ -192,11 +192,11 @@ extern "C" __stdargs int ag_ssl_recv(void *ssl, char * data, int len) {
  * otherwise returns 0 or appropriate error code based on implementation.
  *
  * This function should be used to determine how many bytes are available before attempting to receive data.
- * It is recommended to call this periodically after establishing a connection (ag_ssl_connect()).
+ * It is recommended to call this periodically after establishing a connection (bg_ssl_connect()).
  *
  * @param[in] ssl Pointer to the SSL client instance. Must not be null and must have been successfully connected.
  */
-extern "C" __stdargs int ag_ssl_available(void *ssl) {
+extern "C" __stdargs int bg_ssl_available(void *ssl) {
     if (ssl) {
         auto ssl3 = (Ssl3Client *) ssl;
         return ssl3->getInputStream()->available();
@@ -216,7 +216,7 @@ extern "C" __stdargs int ag_ssl_available(void *ssl) {
  * @param[in] hostname Hostname of the server being verified against.
  * @return int Returns 0 if certificates are valid, -1 otherwise or on error.
  */
-extern "C" __stdargs int ag_ssl_verify(void *ssl, char const * hostname) {
+extern "C" __stdargs int bg_ssl_verify(void *ssl, char const * hostname) {
     if (ssl) {
         auto ssl3 = (Ssl3Client *) ssl;
         return checkCertificates(hostname, ssl3->getCerts(), false);
@@ -233,7 +233,7 @@ extern "C" __stdargs int ag_ssl_verify(void *ssl, char const * hostname) {
  * @param[in] ssl Pointer to the SSL client instance. Must not be null.
  * @param[in] ciphers String containing colon-/comma-separated cipher names (e.g., "ECDHE-ECDSA-CHACHA20-POLY1305")
  */
-extern "C" __stdargs int ag_ssl_set_ciphers(void *ssl, char const * ciphers) {
+extern "C" __stdargs int bg_ssl_set_ciphers(void *ssl, char const * ciphers) {
     if (!ciphers)
         return 0;
 
@@ -259,7 +259,7 @@ extern "C" __stdargs int ag_ssl_set_ciphers(void *ssl, char const * ciphers) {
  * @param[out] digest Buffer to store the resulting SHA-256 hash (array of 32 integers or 32 characters)
  * @return int Returns 0 on success, -1 if any parameters are invalid.
  */
-extern "C" __stdargs int ag_sha256sum(const void *data, int len, unsigned char *digest) {
+extern "C" __stdargs int bg_sha256sum(const void *data, int len, unsigned char *digest) {
 	if (!data || len < 0 || !digest) {
 		return -1;
 	}

@@ -6,7 +6,7 @@
 - **Uploader:** s.franke@bebbosoft.de  
 - **Architecture:** m68k-amigaos  
 - **Type:** comm/net  
-- **Version:** 1.9  
+- **Version:** 1.11
 - **Required:** `bsdsocket.library` (e.g. AmiTCP)  
 - **Replaces:** `amigaget`
 
@@ -44,8 +44,8 @@ Certificates can be installed into `sys:Prefs/Env-Archive/certs`.
 ### `bebboget`
 
 ```text
-$VER: 1.9 (21.11.2025) written by Stefan "Bebbo" Franke
-USAGE: bebboget 1.9 [options] <url>
+$VER: 1.11 (26.11.2025) written by Stefan "Bebbo" Franke
+USAGE: bebboget [options] <url>
 Options:
 -? display help
 -C print outgoing headers

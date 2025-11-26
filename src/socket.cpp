@@ -194,51 +194,26 @@ int Socket::connect() {
 	return 0;
 }
 
-int Socket::send(void const * const buf, unsigned int len) {
-	  const char *p = static_cast<const char*>(buf);
-	  unsigned int total = 0;
-	  while (total < len) {
-	    int n = ::send(sd, p + total, len - total, 0);
-	    if (n > 0) { total += n; continue; }
-	#ifdef __WIN32__
-	    if (n == SOCKET_ERROR) {
-	      int e = GETERROR;
-	      if (e == WSAEWOULDBLOCK) continue; // or return total for non-blocking
-	      return -1;
-	    }
-	#else
-	    if (n < 0) {
-	      if (errno == EINTR) continue;
-	      if (errno == EAGAIN || errno == EWOULDBLOCK) continue; // or return total
-	      return -1;
-	    }
-	#endif
-	    // n == 0 -> peer closed
-	    return -1;
-	  }
-	  return static_cast<int>(total);}
+int Socket::send(void const * const buffer, unsigned int size) {
+//	fd_set writeFds;
+//	FD_ZERO(&writeFds);
+//	FD_SET(sd, &writeFds);
+//	if (::select(sd + 1, NULL, &writeFds, NULL, &timeout) <= 0)
+//		return -1;
+	int sent = ::send(sd, (char const *) buffer, size, 0);
+	if (!sent)
+		return -1;
+	return size;
+}
 
-int Socket::receive(void *buf, unsigned int len) {
-	char *p = static_cast<char*>(buf);
-	  unsigned int total = 0;
-	  while (total < len) {
-	    int n = ::recv(sd, p + total, len - total, 0);
-	    if (n > 0) { total += n; continue; }
-	    if (n == 0) return -1; // peer closed; treat as error for "exact read"
-	#ifdef __WIN32__
-	    int e = GETERROR;
-	    if (e == WSAEINTR) continue;
-	    if (e == WSAEWOULDBLOCK) continue; // or return total
-	    return -1;
-	#else
-	    if (n < 0) {
-	      if (errno == EINTR) continue;
-	      if (errno == EAGAIN || errno == EWOULDBLOCK) continue; // or return total
-	      return -1;
-	    }
-	#endif
-	  }
-	  return static_cast<int>(total);
+int Socket::receive(void *buffer, unsigned int size) {
+//	fd_set readFds;
+//	FD_ZERO(&readFds);
+//	FD_SET(sd, &readFds);
+//	if (select(sd + 1, &readFds, NULL, NULL, &timeout) <= 0)
+//		return -1;
+	unsigned int read = recv(sd, (char *) buffer, size, 0);
+	return read;
 }
 
 int Socket::canRead() {

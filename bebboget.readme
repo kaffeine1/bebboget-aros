@@ -3,7 +3,7 @@ Author:       s.franke@bebbosoft.de
 Uploader:     s.franke@bebbosoft.de
 Architecture: m68k-amigaos
 Type:         comm/net
-Version:      1.10
+Version:      1.11
 Required:     bsdsocket.library (e.g AmiTCP)
 
 ===============================================================================
@@ -156,6 +156,9 @@ SOFTWARE, EVEN IF I HAVE ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
 
 ===============================================================================
 HISTORY
+
+bebboget V1.11 (26.11.2025)
+* function names in example file bg.cpp now match the header
 
 bebboget V1.10 (23.11.2025)
 * consolidating code with bebbossh
