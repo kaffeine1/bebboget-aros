@@ -1,5 +1,5 @@
 /*
- * bebboget - SSL for the Amiga
+ * crypto BlockCipher
  * Copyright (C) 2024-2025  Stefan Franke <stefan@franke.ms>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,12 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * ----------------------------------------------------------------------
- * Project: SSL for the Amiga
- * Purpose: Provide modern SSL/TLS cryptographic primitives and protocol
+ * Project: Cryptography for the Amiga
+ * Purpose: Provide modern cryptographic primitives and protocol
  *          support on classic Amiga systems.
- *
- * Features:
- *  - ASN1 support functions
  *
  * Notes:
  *  - Contributions must preserve author attribution and GPL licensing.

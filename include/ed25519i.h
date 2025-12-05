@@ -1,12 +1,12 @@
 /*
- * bebboget Ed25519 internal math header
+ * crypto Ed25519 internal math header
  * Public Domain - based on SUPERCOP reference implementations
  * Adapted and maintained 2024-2025 by Stefan Franke <stefan@franke.ms>
  *
  * You may use, copy, modify, and distribute this file without restriction.
  *
  * ----------------------------------------------------------------------
- * Project: bebboget
+ * Project: crypto
  * Purpose: Provide internal field and group element operations for Ed25519.
  *
  * Origin & Attribution:
@@ -40,7 +40,7 @@ extern "C" {
 #endif
 
 // Platform-dependent limb type and size
-#ifdef __AMIGA__
+#ifdef __mc68000__
 typedef uint32_t ed_t;
 #define EDX(a,b) ((uint32_t)((b<<16)|a))
 #define EDSIZE 8   // 8 × 32-bit limbs
@@ -71,16 +71,16 @@ typedef struct {
 extern const ed25519 zero;
 
 // Reduction and conversion
-void barrett_reduce(ed25519 r, const ed_t x[32]);     // Reduce 512-bit input to field size
-void ed25519_from32bytes(ed25519 r, const uint8_t x[32]);
-void ed25519_from64bytes(ed25519 r, const uint8_t x[64]);
+void barrett_reduce(uint16_t r[32], const uint16_t x[64]);     // Reduce 512-bit input to field size
+void ed25519_from32bytes(uint16_t r[32], const uint8_t x[32]);
+void ed25519_from64bytes(uint16_t r[32], const uint8_t x[64]);
 
 // Scalar multiplication (variable-time, internal use)
 void precalc(ge25519 pre[16], ge25519 const *p1);
-void ge25519_scalarmult_vartime_base(ge25519 *r, const ed_t s[32]);
+void ge25519_scalarmult_vartime_base(ge25519 *r, const uint16_t s[32]);
 void ge25519_scalarmult_vartime(ge25519 *r, const ge25519 *p, const ed_t s[32]);
-void ge25519_scalarmult_vartime_pre(ge25519 *r, const ge25519 pre[16], const ed_t s1[32]);
-void ge25519_scalarmult_vartime2(ge25519 *r, const ge25519 *p1, const ed_t s1[32], const ed_t s2[32]);
+void ge25519_scalarmult_vartime_pre(ge25519 *r, const ge25519 pre[16], const uint16_t s1[32]);
+void ge25519_scalarmult_vartime2(ge25519 *r, const ge25519 *p1, const uint16_t s1[32], const uint16_t s2[32]);
 
 // Exponentiation helpers
 void pow252_2_2(ed_t t0[16], ed_t z11[16], const ed_t z[16]);
@@ -111,9 +111,19 @@ void secret_expand(uint8_t *az, uint8_t const *sk);
 
 // Inline helpers
 static inline void setone(ed_t *r) {
-    r[0] = 1;
+	r[0] = 1;
+#if (EDSIZE == 8)
+	r[1] = 0;
+	r[2] = 0;
+	r[3] = 0;
+	r[4] = 0;
+	r[5] = 0;
+	r[6] = 0;
+	r[7] = 0;
+#else
     for (short i = 1; i < EDSIZE; i++)   // Fixed: loop to EDSIZE, not hardcoded 16
         r[i] = 0;
+#endif
 }
 
 static inline uint8_t fe25519_getparity(const ed25519 x) {

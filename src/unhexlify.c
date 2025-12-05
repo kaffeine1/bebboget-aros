@@ -1,5 +1,5 @@
 /*
- * bebboget hexlify / unhexlify utility
+ * crypto hexlify / unhexlify utility
  * Copyright (C) 2024-2025  Stefan Franke <stefan@franke.ms>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * ----------------------------------------------------------------------
- * Project: bebboget
+ * Project: crypto
  * Module: hexlify / unhexlify
  *
  * Purpose:

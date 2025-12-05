@@ -1,5 +1,5 @@
 /*
- * bebboget ChaCha20 / Poly1305 implementation
+ * crypto ChaCha20 / Poly1305 implementation
  * Copyright (C) 2024-2025  Stefan Franke <stefan@franke.ms>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * ----------------------------------------------------------------------
- * Project: bebboget
+ * Project: crypto
  * Purpose: Provide ChaCha20 stream cipher and Poly1305 authenticator,
  *          combined as ChaCha20-Poly1305 AEAD construction.
  *
@@ -36,6 +36,11 @@
 #include "bc.h"
 #include "chacha20.h"
 #include "fastmath32.h"
+
+#ifdef __AMIGA__
+#else
+#include <endian.h>
+#endif
 
 #undef DEBUG
 #ifdef DEBUG

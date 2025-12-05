@@ -1,5 +1,5 @@
 /*
- * bebboget SHA-512 implementation (FIPS 180-4)
+ * crypto SHA-512 implementation (FIPS 180-4)
  * Copyright (C) 2024-2025  Stefan Franke <stefan@franke.ms>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * ----------------------------------------------------------------------
- * Project: bebboget
+ * Project: crypto
  * Module: SHA-512
  *
  * Purpose:

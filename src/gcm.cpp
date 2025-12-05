@@ -1,5 +1,5 @@
 /*
- * bebboget GCM (Galois/Counter Mode) implementation
+ * crypto GCM (Galois/Counter Mode) implementation
  * Copyright (C) 2024-2025  Stefan Franke <stefan@franke.ms>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * ----------------------------------------------------------------------
- * Project: bebboget
+ * Project: crypto
  * Module: GCM (Galois/Counter Mode)
  *
  * @see http://csrc.nist.gov/groups/ST/toolkit/BCM/documents/proposedmodes/gcm/gcm-spec.pdf
@@ -64,7 +64,7 @@
  * @return true if the lowest bit was set.
  */
 #if defined(__AMIGA__)
-static __attribute__((always_inline))
+static inline __attribute__((always_inline))
 int shiftRight1Inplace(uint8_t *v) {
 	uint32_t * l = (uint32_t *)v;
 	register uint32_t d0 asm("d0");
@@ -86,7 +86,7 @@ int shiftRight1Inplace(uint8_t *v) {
 	return d0;
 }
 #else
-static __attribute__((always_inline))
+static inline __attribute__((always_inline))
 int shiftRight1Inplace(uint8_t *v) {
 	uint8_t hi = 0;
 	for (int i = 0; i < 16; ++i) {
@@ -169,7 +169,9 @@ static uint8_t* shiftRight8(uint8_t const*from, uint8_t * b) {
 
 #define V(a,b,c,d) {0x##a, 0x##b}, {0x##c, 0x##d}
 /** The lookup table R to calculate the table m. */
+#ifdef __AMIGA__
 __attribute((section(".text")))
+#endif
 const uint8_t GCM::R[256][2] = {
  V(00,00,01,C2), V(03,84,02,46),  V(07,08,06,CA), V(04,8C,05,4E),
  V(0E,10,0F,D2), V(0D,94,0C,56),  V(09,18,08,DA), V(0A,9C,0B,5E),

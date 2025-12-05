@@ -1,5 +1,5 @@
 /*
- * bebboget FastMath32 big-integer utilities
+ * crypto FastMath32 big-integer utilities
  * Copyright (C) 2024-2025  Stefan Franke <stefan@franke.ms>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * ----------------------------------------------------------------------
- * Project: bebboget
+ * Project: crypto
  * Purpose: Provide 32-bit word-based big integer math routines for
  *          cryptographic primitives (modular arithmetic, Montgomery reduction).
  *          Provide modular reduction (xmod) and precomputation helper (fill)
