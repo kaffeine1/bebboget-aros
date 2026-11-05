@@ -728,7 +728,12 @@ char* download() {
                 } else if (!outFileSet && 0 == strcasecmp("Content-Disposition", b)) {
                     char * fn = strstr(colon, "filename=");
                     if (fn) {
-                        src = mkFileName(fn + 9);
+                        // filename="name" or filename=name; keep only the name
+                        fn += 9;
+                        char * end = *fn == '"' ? strchr(++fn, '"') : strchr(fn, ';');
+                        if (end)
+                            *end = 0;
+                        src = mkFileName(fn);
                     }
                 }
             }
