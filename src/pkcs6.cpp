@@ -279,6 +279,7 @@ char* readOids(bytea const &block) {
 void readTimes(CertificateInfo &ci, bytea const &times) {
     const uint8_t *p   = times.begin();
     const uint8_t *end = times.begin() + times.size();
+    int n = 0; // notBefore, then notAfter: the info can be read more than once
 
     while (p < end) {
         if (*p != 0x17 && *p != 0x18) { // skip until UTCTime (0x17) or GeneralizedTime (0x18)
@@ -312,7 +313,7 @@ void readTimes(CertificateInfo &ci, bytea const &times) {
         timeval.tm_mon -= 1;
         time_t tval = mktime(&timeval);
 
-        if (!ci.validFrom) {
+        if (n++ == 0) {
             ci.validFrom = tval;
         } else {
             ci.validTo = tval;
