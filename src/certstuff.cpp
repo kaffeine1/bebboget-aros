@@ -136,7 +136,9 @@ bytea loadCertificate(char const* name) {
 void installCertificate(CertificateInfo const& ci) {
     char* name = makeCertName(ci.owner);
 #if defined(__AMIGA__) || defined(__AROS__)
-    CreateDir(certDir);
+    BPTR dir = CreateDir(certDir); // a new directory comes with an exclusive lock
+    if (dir)
+        UnLock(dir);
     BPTR f = Open(name, MODE_NEWFILE);
 #else
     mkdir(certDir, 0700);
