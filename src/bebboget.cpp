@@ -120,6 +120,7 @@ static int pmax = 4;
 static int nredir = 7;
 static int sloppy;
 static int installCertificates;
+static int exitCode;
 
 static mstl::vector<char const *> headers;
 static mstl::vector<uint8_t const *> ciphers;
@@ -803,6 +804,9 @@ char* download() {
     if (size == 0) {
         size = pos;
         updateStats();
+    } else if (pos < size) {
+        printf("%sincomplete download: %ld of %ld bytes\n", progress ? "\n" : "", (long) pos, (long) size);
+        exitCode = 10;
     }
 
     return 0;
@@ -836,5 +840,5 @@ __stdargs
         --nredir;
     }
 
-    return 0;
+    return exitCode;
 }}
