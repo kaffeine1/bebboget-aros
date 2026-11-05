@@ -49,8 +49,12 @@
 #include <winsock.h>
 #else
 #include <netinet/in.h>
+#ifdef __AROS__
+#include <sys/time.h>   // struct timeval
+#include <sys/socket.h> // SOMAXCONN
+#endif
 typedef int SOCKET;
-#if defined(__AMIGA__)
+#if defined(__AMIGA__) || defined(__AROS__)
 
 #define INVALID_SOCKET (-1)
 #define SOCKET_ERROR   (-1)

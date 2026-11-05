@@ -44,9 +44,15 @@
 
 #include <sys/stat.h>
 
-#if defined(__AMIGA__)
+#if defined(__AMIGA__) || defined(__AROS__)
 #include <proto/dos.h>
 #include <proto/exec.h>
+#if defined(BEBBOSSH_AROS_MINCRT)
+#include "aros_mincrt_dos.h" // x86_64: library calls with the base in r12
+#endif
+#endif
+
+#if defined(__AMIGA__)
 #include <amistdio.h>
 
 #else
@@ -341,7 +347,7 @@ static void parseParams(unsigned argc, const char **argv) {
     exit(10);
 }
 
-#if defined(__AMIGA__)
+#if defined(__AMIGA__) || defined(__AROS__)
 
 typedef struct DateStamp TimeType;
 
@@ -512,7 +518,7 @@ static void updateStats() {
 
         // update every second
         int done = size && size == pos;
-#if defined(__AMIGA__)
+#if defined(__AMIGA__) || defined(__AROS__)
         int diff = now.ds_Tick - lastTime.ds_Tick;
         if (diff < 0 || diff > TICKS_PER_SECOND || done) {
 #else
@@ -557,7 +563,7 @@ char const * mkFileName(char const * path) {
 
     int no = 0;
     for(;;) {
-#if defined(__AMIGA__)
+#if defined(__AMIGA__) || defined(__AROS__)
         BPTR lock = Lock(r, SHARED_LOCK);
         if (!lock)
             break;
@@ -676,7 +682,7 @@ char* download() {
     os->write(msg, strlen(msg));
 
     bytea rest;
-#if defined(__AMIGA__)
+#if defined(__AMIGA__) || defined(__AROS__)
     while ((SetSignal(0L,SIGBREAKF_CTRL_C) & SIGBREAKF_CTRL_C) == 0) {
 #else
     while (1) {
@@ -742,14 +748,14 @@ char* download() {
 
     updateStats();
 
-#if defined(__AMIGA__)
+#if defined(__AMIGA__) || defined(__AROS__)
     BPTR out = Open(src, MODE_NEWFILE);
 #else
     FILE * out = fopen(src, "wb+");
 #endif
     if (out) {
         if (rest.size() > 2) { // skip \r\n
-#if defined(__AMIGA__)
+#if defined(__AMIGA__) || defined(__AROS__)
             Write(out, rest.begin() + 2, rest.size() - 2);
 #else
             fwrite(rest.begin() + 2, rest.size() - 2, 1, out);
@@ -759,7 +765,7 @@ char* download() {
         pos = rest.size() - 2;
         updateStats();
 
-#if defined(__AMIGA__)
+#if defined(__AMIGA__) || defined(__AROS__)
         while ((SetSignal(0L,SIGBREAKF_CTRL_C) & SIGBREAKF_CTRL_C) == 0) {
 #else
     	while (1) {
@@ -774,13 +780,13 @@ char* download() {
 
             pos += read;
             updateStats();
-#if defined(__AMIGA__)
+#if defined(__AMIGA__) || defined(__AROS__)
             Write(out, buffer, read);
 #else
             fwrite(buffer, read, 1, out);
 #endif
         }
-#if defined(__AMIGA__)
+#if defined(__AMIGA__) || defined(__AROS__)
         Close(out);
 #else
         fclose(out);
@@ -798,7 +804,7 @@ char* download() {
 }
 
 void myinit() {
-#if defined(__AMIGA__)
+#if defined(__AMIGA__) || defined(__AROS__)
     stdinBptr = Input();
     stdoutBptr = Output();
 #endif

@@ -40,10 +40,23 @@
 #include <pkcs6.h>
 #include <log.h>
 
-#if defined(__AMIGA__)
+#if defined(__AMIGA__) || defined(__AROS__)
 #include <proto/dos.h>
 #include <proto/exec.h>
+#if defined(BEBBOSSH_AROS_MINCRT)
+#include "aros_mincrt_dos.h" // x86_64: library calls with the base in r12
+#endif
+#ifdef __AROS__
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
+
+extern char* concat(const char* s0, ...);
+
+#define gets(a,b) fgets(a, b, stdin)
+#else
 #include <amistdio.h>
+#endif
 
 /// Default certificate directory on Amiga
 char const* certDir = "sys:Prefs/Env-Archive/certs";
@@ -94,13 +107,13 @@ char* makeCertName(char const* in) {
 
 /// Load certificate from filesystem
 bytea loadCertificate(char const* name) {
-#if defined(__AMIGA__)
+#if defined(__AMIGA__) || defined(__AROS__)
     BPTR f = Open(name, MODE_OLDFILE);
 #else
     FILE* f = fopen(name, "rb");
 #endif
     if (f) {
-#if defined(__AMIGA__)
+#if defined(__AMIGA__) || defined(__AROS__)
         Seek(f, 0, OFFSET_END);
         int size = Seek(f, 0, OFFSET_BEGINNING);
         bytea installed(size);
@@ -122,7 +135,7 @@ bytea loadCertificate(char const* name) {
 /// Install certificate to filesystem
 void installCertificate(CertificateInfo const& ci) {
     char* name = makeCertName(ci.owner);
-#if defined(__AMIGA__)
+#if defined(__AMIGA__) || defined(__AROS__)
     CreateDir(certDir);
     BPTR f = Open(name, MODE_NEWFILE);
 #else
@@ -130,7 +143,7 @@ void installCertificate(CertificateInfo const& ci) {
     FILE* f = fopen(name, "wb");
 #endif
     if (f) {
-#if defined(__AMIGA__)
+#if defined(__AMIGA__) || defined(__AROS__)
         Write(f, ci.cert->begin(), ci.cert->size());
         Close(f);
 #else
@@ -144,14 +157,14 @@ void installCertificate(CertificateInfo const& ci) {
 /// Check if certificate is already installed
 int isInstalledCertificate(CertificateInfo const& ci) {
     char* name = makeCertName(ci.owner);
-#if defined(__AMIGA__)
+#if defined(__AMIGA__) || defined(__AROS__)
     BPTR f = Open(name, MODE_OLDFILE);
 #else
     FILE* f = fopen(name, "rb");
 #endif
     if (f) {
         bytea installed(ci.cert->size());
-#if defined(__AMIGA__)
+#if defined(__AMIGA__) || defined(__AROS__)
         Read(f, installed.begin(), installed.size());
         Close(f);
 #else

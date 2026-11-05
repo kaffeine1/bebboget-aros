@@ -4,11 +4,61 @@
 
 - **Author:** Stefan "Bebbo" Franke <s.franke@bebbosoft.de>  
 - **Uploader:** s.franke@bebbosoft.de  
-- **Architecture:** m68k-amigaos  
+- **Upstream architecture:** m68k-amigaos  
+- **AROS fork targets:** i386 `alt-abiv0`, x86_64 (mincrt), aarch64 (Raspberry Pi)  
 - **Type:** comm/net  
 - **Version:** 1.11
 - **Required:** `bsdsocket.library` (e.g. AmiTCP)  
 - **Replaces:** `amigaget`
+
+---
+
+## AROS port
+
+This repository is a fork of bebboget by Stefan "Bebbo" Franke, based on
+upstream 1.11 (commit `9b223f1` of https://franke.ms/git/bebbo/bebboget). The
+AROS changes are Copyright (C) 2026 Michele Dipace
+<michele.dipace@kaffeine.net>, GNU GPL v3 or later like the upstream code.
+
+One source tree builds three AROS targets:
+
+| Target | Makefile | Tested on |
+| --- | --- | --- |
+| i386 `alt-abiv0` (AROS One 32-bit) | `Makefile.aros` | AROS One i386 under QEMU |
+| x86_64 `mincrt` (AROS One 64-bit) | `Makefile.aros-x86_64` | AROS One x86_64 under QEMU |
+| aarch64 (AROS on the Raspberry Pi) | `Makefile.aros-aarch64` | QEMU `raspi3b`, short transfers only |
+
+There is no AROS release yet.
+
+What works: HTTPS downloads over TLS 1.2 and TLS 1.3 (ChaCha20-Poly1305 and
+AES-GCM), certificate checks against the root certificates installed with
+`installcerts`, redirects, the progress line, Ctrl-C and the certificate
+questions at the console. Certificates go to `SYS:Prefs/Env-Archive/certs` as
+on AmigaOS.
+
+While porting I fixed some bugs in the shared code. They affect every
+platform, so each one is a separate commit: certificate dates read twice,
+uninitialized RSA work buffers, the P-384 reduction, the ECDSA curve chosen
+from the hash instead of the key, SHA-384 and SHA-512 RSA certificate
+signatures, long ASN.1 lengths, and variadic lists ended with an integer 0
+instead of a null pointer.
+
+Known limits:
+
+- A server whose chain ends in a cross-signed copy of an installed root
+  certificate, signed by a root that is no longer in the bundle, needs a
+  confirmation at the console (www.google.com today).
+- TLS 1.2 has no ECDHE-ECDSA cipher suites: such servers need TLS 1.3.
+- `http://` URLs use port 443 unless a port is given, a file name taken from
+  `Content-Disposition` keeps its quotes, and a transfer that ends early is
+  not reported as incomplete.
+- x86_64: about 6 KB of memory stay allocated after each run, because the
+  minimal C runtime does not free at exit.
+- aarch64: not tested on real hardware yet. In the QEMU VM every transfer
+  ends after about 150 seconds (slow USB network of the VM); the bytes that
+  arrive are correct.
+
+Build and port notes: `AROS_PORTING.md`.
 
 ---
 

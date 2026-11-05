@@ -38,6 +38,8 @@
 #ifdef __AMIGA__
   #include <hardware/custom.h>
   #include <proto/dos.h>
+#elif defined(__AROS__)
+  #include "aros_randpool.h" // aros_randfill()
 #elif defined(__unix__)
   #include <unistd.h>
   #include <sys/random.h>
@@ -65,6 +67,8 @@ void randfill(void * _to, unsigned len) {
 		t = (t >> 31) | (t << 1);
 		*to++ = x;
 	}
+#elif defined(__AROS__)
+	aros_randfill(_to, len);
 #elif defined(__unix__)
     unsigned char *to = (unsigned char *)_to;
     if (getrandom(to, len, 0) < 0) {

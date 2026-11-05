@@ -48,6 +48,12 @@ public:
     /// Clone this digest instance
     MessageDigest* clone() const;
 
+    /// Add data without virtual dispatch. Used by the AROS random pool.
+    void updateDirect(const void* d, unsigned len);
+
+    /// Finalize without virtual dispatch. Used by the AROS random pool.
+    void digestDirect(void* to);
+
 protected:
     /// Reset internal state
     void reset();

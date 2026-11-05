@@ -66,6 +66,23 @@ static struct _ {
 #define SOCKET_ERROR (-1)
 #define GETERROR errno
 #define closesocket close
+#elif defined(__AROS__)
+// the socket calls are functions of socket_glue_aros.c, not library macros;
+// select() is a macro for WaitSelect() in clib/bsdsocket_protos.h
+#define BSDSOCKET_NOLIBDEFINES
+#include <stdio.h>
+#include <string.h>
+extern "C" { // the AROS prototypes have no C linkage of their own
+#include <sys/socket.h>
+#include <netdb.h>
+#include <arpa/inet.h>
+#include <netinet/tcp.h>
+#include <proto/bsdsocket.h>
+}
+
+inline int closesocket(int s) {
+	return CloseSocket(s);
+}
 #elif  defined(__AMIGA__)
 #include <amistdio.h>
 #include <sys/socket.h>
@@ -179,7 +196,7 @@ int Socket::connect() {
 	if ((sd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) == INVALID_SOCKET)
     return GETERROR;
 
-#ifdef __AMIGA__
+#if defined(__AMIGA__) || defined(__AROS__)
 	// bind to a local port before connecting
 	struct sockaddr_in sinLocal;
 	memset(&sinLocal, 0, sizeof(sinLocal));

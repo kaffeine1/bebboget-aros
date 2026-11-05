@@ -1,0 +1,32 @@
+# AROS x86_64 (AROS One ABIv11) build wrapper.
+# Uses the x86_64-aros crosstools GCC from PATH and a minimal C runtime
+# (aros_mincrt.c): every library call goes through a wrapper that loads the
+# library base into r12, as the AROS One libraries expect.
+
+OUTDIR ?= aros-x86_64
+AROS_TARGET_TRIPLET ?= x86_64-aros
+SDK_GCC_VERSION ?= 10.5.0
+STRIP_OUTPUTS ?= yes
+SDK_LDFLAGS ?= -nostdlib
+AROS_X86_64_RUNTIME_SDK ?= $(HOME)/amiga-dev/sdks/aros-one-x86_64
+STARTUP ?= $(firstword $(wildcard $(AROS_X86_64_RUNTIME_SDK)/Development/lib/startup.o) $(shell $(CC) -print-file-name=startup.o))
+TARGET_CFLAGS ?= -mcmodel=large -fno-asynchronous-unwind-tables -fno-unwind-tables -fno-reorder-blocks-and-partition -DFD_SETSIZE=1024 -DBEBBOSSH_AROS_MINCRT=1
+CXXFLAGS ?= -fno-exceptions -fno-rtti -fno-weak
+SDK_LIBS ?= -lautoinit -lamiga -laros -ldos -lexec -lutility -lgcc -lautoinit -lamiga
+LIB_SOURCES ?= socket_glue_aros.c bg.cpp \
+	biginteger.cpp unhexlify.c equals.cpp dump.c \
+	stream.cpp socket.cpp \
+	vector.cpp c++support.cpp \
+	chacha20.cpp poly1305.cpp chacha20poly1305.cpp \
+	md.cpp sha256.cpp sha384512.cpp sha512.cpp sha384.cpp sha.cpp md5.cpp bc.cpp \
+	aes.cpp rc4.cpp des.cpp des3.cpp gcm.cpp \
+	rand.c aros_randpool.cpp log.c mimedecode.c certstuff.cpp \
+	x25519.cpp \
+	pkcs6.cpp ecmath.cpp fastmath.cpp asn1.cpp secpXXXr1.cpp \
+	ssl3.cpp ssl3client.cpp \
+	aros_mincrt.c aros_mincrt_stdio.c aros_startup_flags.c
+# the AROS loader rejects a .got section; byte 8 of the ELF header is the AROS ABI version
+POST_LINK = $(OBJCOPY) -R .got $@ && printf '\013' | dd of=$@ bs=1 seek=8 conv=notrunc 2>/dev/null
+.DEFAULT_GOAL := all
+
+include Makefile.aros
