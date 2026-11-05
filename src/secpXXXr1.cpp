@@ -300,27 +300,24 @@ int SecpR1::verify(bytez const &messageHash, uint8_t const *sigData, int len, by
 
 
 int SecpR1::verify(bytez const &messageHash, bytez const &r, bytez const &s, bytez const &pubk) {
-    // Log start of verification, choose curve based on hash length
-    logme(L_DEBUG, "verify %s START", messageHash.size() == 32 ? "secp256r1" : "secp384r1");
-
-    Curve *c = nullptr;
-    int coordLen = 0;
-    switch (messageHash.size()) {
-        case 32: // SHA-256 -> secp256r1
-            c = &SECP256R1;
-            coordLen = 32;
-            break;
-        case 48: // SHA-384 -> secp384r1
-            c = &SECP384R1;
-            coordLen = 48;
-            break;
-        default: // unsupported curve
-            return false;
-    }
-
     // Handle SSL/TLS public key encoding:
     // Sometimes ASN.1 OCTET STRING adds a leading 0x00 before the uncompressed point marker (0x04).
     int offset = (pubk[0] == 0x00 ? 1 : 0);
+
+    // The curve follows the public key, not the hash: a P-384 key may sign SHA-256
+    // and a P-256 key SHA-384 (the hash is then cut to the size of N, FIPS 186-4 6.4)
+    Curve *c = nullptr;
+    int coordLen = 0;
+    if (pubk.size() - offset >= 1 + 2 * 48) {
+        c = &SECP384R1;
+        coordLen = 48;
+    } else if (pubk.size() - offset >= 1 + 2 * 32) {
+        c = &SECP256R1;
+        coordLen = 32;
+    } else { // unsupported curve
+        return false;
+    }
+    logme(L_DEBUG, "verify %s START", coordLen == 32 ? "secp256r1" : "secp384r1");
 
     // Must have uncompressed point marker (0x04)
     if (pubk[offset] != 0x04) return false;
@@ -333,7 +330,7 @@ int SecpR1::verify(bytez const &messageHash, bytez const &r, bytez const &s, byt
     BigInteger bsinv = bs.modInverse(c->N);
 
     // Convert message hash to BigInteger and multiply by s^-1 mod N
-    BigInteger bm(1, messageHash.begin(), messageHash.size());
+    BigInteger bm(1, messageHash.begin(), messageHash.size() < coordLen ? messageHash.size() : coordLen);
     BigInteger bmbi = bm.multiply(bsinv);
     BigInteger bminv = bmbi.mod(c->N);
 
@@ -361,7 +358,7 @@ int SecpR1::verify(bytez const &messageHash, bytez const &r, bytez const &s, byt
     // vx = w.x mod N
     BigInteger vx = w.x.mod(c->N);
 
-    logme(L_DEBUG, "verify %s STOP", messageHash.size() == 32 ? "secp256r1" : "secp384r1");
+    logme(L_DEBUG, "verify %s STOP", coordLen == 32 ? "secp256r1" : "secp384r1");
 
     // Signature valid if vx == r
     return br.equals(vx);
