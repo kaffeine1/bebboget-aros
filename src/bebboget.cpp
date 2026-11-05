@@ -607,7 +607,7 @@ char* download() {
         host = h;
     }
 
-    int port = 443;
+    int port = isHttps ? 443 : 80;
     char const *colon = strchr(host, ':');
     if (colon) {
         int len = colon - host;
