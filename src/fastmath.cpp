@@ -526,6 +526,7 @@ void FastMath32::xmod(uint32_t *aInOut, uint32_t const *bIn, int al0, int bl) {
 
 static uinta fill(int nibble, uinta *data, int muLen, uint32_t const *mod, int modLen, int n0) {
     uinta x(modLen + modLen + 1);
+    memset(x.begin(), 0, x.size() * sizeof(uint32_t)); // montgomery() reads 2 * modLen words
     uinta *a, *b;
 
     switch (nibble) {
@@ -666,6 +667,7 @@ uinta FastMath32::oddModPow(uinta const &z, bytez const &exp, uinta const &mod) 
 	uinta buf1(maxLen);
 
 	memset(buf0.begin(), 0, buf0.size() * sizeof(uint32_t));
+	memset(buf1.begin(), 0, buf1.size() * sizeof(uint32_t)); // montgomery() reads 2 * modLen words
 	memcpy(buf0.begin() + modLen, z.begin(), z.size() * sizeof(uint32_t));
 	xmod(buf0.begin(), mod.begin(), buf0.size() - 1, modLen);
 
