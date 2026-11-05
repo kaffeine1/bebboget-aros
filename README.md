@@ -49,9 +49,8 @@ Known limits:
   certificate, signed by a root that is no longer in the bundle, needs a
   confirmation at the console (www.google.com today).
 - TLS 1.2 has no ECDHE-ECDSA cipher suites: such servers need TLS 1.3.
-- `http://` URLs use port 443 unless a port is given, a file name taken from
-  `Content-Disposition` keeps its quotes, and a transfer that ends early is
-  not reported as incomplete.
+- The HTTP status is not checked: an error page from the server is saved as
+  the file.
 - x86_64: about 6 KB of memory stay allocated after each run, because the
   minimal C runtime does not free at exit.
 - aarch64: not tested on real hardware yet. In the QEMU VM every transfer
