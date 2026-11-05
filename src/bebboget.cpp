@@ -545,9 +545,9 @@ char const * mkFileName(char const * path) {
         if (odLen) {
             char last = outDir[odLen - 1];
             if (last == ':' || last == '/')
-                q = concat(outDir, q, 0);
+                q = concat(outDir, q, NULL);
             else
-                q = concat(outDir, "/", q, 0);
+                q = concat(outDir, "/", q, NULL);
         }
     }
 
@@ -570,10 +570,10 @@ char const * mkFileName(char const * path) {
 #endif
 
         char tmp[16];
-        snprintf(tmp, 15, "%ld", no++);
+        snprintf(tmp, 15, "%d", no++);
 
         free(r);
-        r = concat(q, ".", tmp, 0);
+        r = concat(q, ".", tmp, NULL);
     }
 
     return r;
@@ -658,16 +658,16 @@ char* download() {
     }
 
     char *msg0 = concat("GET ", path, " HTTP/1.1\r\nhost: ", host, "\r\nConnection: close\r\n"
-            "User-Agent: BebboGet\r\n", 0);
+            "User-Agent: BebboGet\r\n", NULL);
 
     for (int i = 0; i < headers.size(); ++i) {
         char const * h = headers[i];
-        char * msg = concat(msg0, h, "\r\n", 0);
+        char * msg = concat(msg0, h, "\r\n", NULL);
         free(msg0);
         msg0 = msg;
     }
 
-    char * msg = concat(msg0, "\r\n", 0);
+    char * msg = concat(msg0, "\r\n", NULL);
     free(msg0);
 
     if (clientHeaders)

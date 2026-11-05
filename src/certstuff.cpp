@@ -79,7 +79,7 @@ static struct __ {
 
 /// Generate sanitized certificate file name
 char* makeCertName(char const* in) {
-    char* name = concat(certDir, "/", in, 0);
+    char* name = concat(certDir, "/", in, NULL);
     for (char* p = name + strlen(certDir) + 1; *p; ++p) {
         if (!(*p >= '0' && *p <= '9') &&
             !(*p >= '@' && *p <= 'Z') &&
@@ -87,7 +87,7 @@ char* makeCertName(char const* in) {
             *p != '-')
             *p = '_';
     }
-    char* r = concat(name, ".cer", 0);
+    char* r = concat(name, ".cer", NULL);
     free(name);
     return r;
 }

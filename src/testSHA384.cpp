@@ -77,7 +77,7 @@ int testHMAC() {
 			"71 F9 36 2F 2C 2F E2 A7  6B FD 78 DF EC 4E A9 B5");
 
 	unsigned char d[48];
-	sha384.hmac(d, NULLBYTES, 1, NULLBYTES, 48, 0);
+	sha384.hmac(d, NULLBYTES, 1, NULLBYTES, 48, NULL);
 	return assertArrayEquals(EXPECTED1, d, 48);
 }
 

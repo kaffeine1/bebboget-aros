@@ -211,7 +211,7 @@ void MessageDigest::expand(uint8_t *r, int toLen, uint8_t const *salt, int saltL
 	uint8_t c[1] = { 0 };
 	for (int off = 0; off < toLen; off += dlen) {
 		++c[0];
-		hmac(d, salt, saltLen, d, dlen, data, dataLen, c, 1, 0);
+		hmac(d, salt, saltLen, d, dlen, data, dataLen, c, 1, NULL);
 		dlen = len();
 		int toCopy = toLen - off;
 		if (toCopy > dlen)

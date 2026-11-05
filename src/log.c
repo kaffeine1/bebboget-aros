@@ -85,7 +85,8 @@ void logme(enum DebugLevel lvl, char const *fmt, ...) {
 	    int ms = tv.tv_usec / 1000;            // milliseconds (0...999)
 #endif
 		struct tm const  * t = gmtime(&ti);
-		fprintf(stderr, "[%04ld.%02ld.%02ld-%02ld:%02ld:%02ld.%03ld] [%s] ", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec, ms, LEVELNAMES[lvl]);
+		fprintf(stderr, "[%04ld.%02ld.%02ld-%02ld:%02ld:%02ld.%03ld] [%s] ", (long)t->tm_year + 1900, (long)t->tm_mon + 1, (long)t->tm_mday,
+				(long)t->tm_hour, (long)t->tm_min, (long)t->tm_sec, (long)ms, LEVELNAMES[lvl]); // long: %ld, also on 64 bit
 		vfprintf(stderr, fmt, args);
 		fputs("\r\n", stderr);
 		va_end(args);

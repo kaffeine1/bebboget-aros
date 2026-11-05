@@ -254,7 +254,7 @@ void Ssl3::calcMessageHash(uint8_t *to, MessageDigest *md, bytea &secret, unsign
 		b13[10] = versionMinor;
 		b13[11] = blength >> 8;
 		b13[12] = blength;
-		md->hmac(to, secret.begin(), secret.size(), b13, 13, b, blength, 0);
+		md->hmac(to, secret.begin(), secret.size(), b13, 13, b, blength, NULL);
 		return;
 	}
 
@@ -698,7 +698,7 @@ void Ssl3::createTls13EarlyKeys(int isServer) {
 	int hashLen = readHash->len();
 	uint8_t earlySecret[hashLen];
 	memset(earlySecret, 0, hashLen);
-	readHash->hmac(earlySecret, NULLBYTES, 1, NULLBYTES, hashLen, 0);
+	readHash->hmac(earlySecret, NULLBYTES, 1, NULLBYTES, hashLen, NULL);
 
 	uint8_t emptyHash[hashLen];
 	readHash->digest(emptyHash);
@@ -707,7 +707,7 @@ void Ssl3::createTls13EarlyKeys(int isServer) {
 	readHash->expandLabel(derivedSecret, hashLen, earlySecret, hashLen, "tls13 derived", 13, emptyHash, hashLen);
 
 	handshakeSecret.setSize(hashLen);
-	readHash->hmac(handshakeSecret.begin(), derivedSecret, hashLen, masterSecret.begin(), masterSecret.size(), 0);
+	readHash->hmac(handshakeSecret.begin(), derivedSecret, hashLen, masterSecret.begin(), masterSecret.size(), NULL);
 
 	clientSecret.setSize(hashLen);
 	readHash->expandLabel(clientSecret.begin(), hashLen, handshakeSecret.begin(), hashLen, "tls13 c hs traffic", 18, helloHash, hashLen);
@@ -771,7 +771,7 @@ bytea Ssl3::createTls13HandshakeFinished(MessageDigest *md, bytea const &secret)
 
 	bytea verifyData;
 	verifyData.setSize(l);
-	md->hmac(verifyData.begin(), finishedKey, l, finishedHash, l, 0);
+	md->hmac(verifyData.begin(), finishedKey, l, finishedHash, l, NULL);
 	return verifyData;
 }
 
@@ -1022,7 +1022,7 @@ void Ssl3::createTls13Keys(int isServer, MessageDigest *lastHsHash) {
 			hashLen);
 
 	masterSecret.setSize(hashLen);
-	readHash->hmac(masterSecret.begin(), derivedSecret.begin(), derivedSecret.size(), NULLBYTES, hashLen, 0);
+	readHash->hmac(masterSecret.begin(), derivedSecret.begin(), derivedSecret.size(), NULLBYTES, hashLen, NULL);
 
 //    	Misc.dump("masterSecret", System.out, masterSecret);
 
@@ -1093,12 +1093,12 @@ _dump("seed", seed.begin(), seed.size());
 
 	int pos = 0;
 	while (pos < length) {
-		md->hmac(ai.begin(), secret.begin(), secret.size(), aip->begin(), aip->size(), 0);
+		md->hmac(ai.begin(), secret.begin(), secret.size(), aip->begin(), aip->size(), NULL);
 #ifdef DEBUG
 		_dump("ai", ai.begin(), ai.size());
 #endif
 		aip = &ai;
-		md->hmac(d.begin(), secret.begin(), secret.size(), aip->begin(), aip->size(), seed.begin(), seed.size(), 0);
+		md->hmac(d.begin(), secret.begin(), secret.size(), aip->begin(), aip->size(), seed.begin(), seed.size(), NULL);
 		int copyLen = d.size();
 		if (pos + copyLen > length)
 			copyLen = length - pos;

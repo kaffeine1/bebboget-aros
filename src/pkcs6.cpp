@@ -253,7 +253,7 @@ char* readDns(bytea const &attrs) {
 				char *s = (char *)malloc(len + 1);
 				strncpy(s, (char*) p, len);
 				s[len] = 0;
-				char *c = concat(s, " ", sdns, 0);
+				char *c = concat(s, " ", sdns, NULL);
 				free(sdns);
 				sdns = c;
 				free(s);
@@ -270,7 +270,7 @@ char* readOids(bytea const &block) {
 		bytea v = getValueFor(block, **p);
 		if (v.size()) {
 			v.setSizeZ(v.size() + 1);
-			char *t = concat((char*) v.begin(), r ? ", " : "", r, 0);
+			char *t = concat((char*) v.begin(), r ? ", " : "", r, NULL);
 			free(r);
 			r = t;
 		}
