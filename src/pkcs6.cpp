@@ -101,6 +101,8 @@ static bytea id_at_dns = Asn1::string2Oid("2.5.29.17");
 static bytea md5withRSAEncryption = Asn1::string2Oid("1.2.840.113549.1.1.4");
 static bytea sha1withRSAEncryption = Asn1::string2Oid("1.2.840.113549.1.1.5");
 static bytea sha256WithRSAEncryption = Asn1::string2Oid("1.2.840.113549.1.1.11");
+static bytea sha384WithRSAEncryption = Asn1::string2Oid("1.2.840.113549.1.1.12");
+static bytea sha512WithRSAEncryption = Asn1::string2Oid("1.2.840.113549.1.1.13");
 
 bytea Pkcs6::getX509EcPub(bytez const &cert) {
 	bytea b = Asn1::getSeq(cert, CERTPK_PATH, 0);
@@ -482,6 +484,10 @@ void Pkcs6::verifyCertificates(mstl::vector<CertificateInfo> &cis, int verify) {
 					md = new SHA();
 				else if (equals(oidData, sha256WithRSAEncryption))
 					md = new SHA256();
+				else if (equals(oidData, sha384WithRSAEncryption))
+					md = new SHA384();
+				else if (equals(oidData, sha512WithRSAEncryption))
+					md = new SHA512();
 				else if (equals(oidData, md5withRSAEncryption))
 					md = new MD5();
 				if (md == 0)
