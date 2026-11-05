@@ -683,6 +683,7 @@ char* download() {
     os->write(msg, strlen(msg));
 
     bytea rest;
+    size = 0; // once: the headers can take more than one read
 #if defined(__AMIGA__) || defined(__AROS__)
     while ((SetSignal(0L,SIGBREAKF_CTRL_C) & SIGBREAKF_CTRL_C) == 0) {
 #else
@@ -698,8 +699,6 @@ char* download() {
 
         rest.setSize(start + read);
         rest[rest.size()] = 0;
-
-        size = 0;
 
         // read header
         for (;;) {
