@@ -236,7 +236,7 @@ bytea Asn1::getData(bytez const & ba, int off) {
 	// int start = off;
 	// int typ = b[off++];
 	++off;
-	int len = b[off++];
+	int len = (signed char) b[off++]; // as in getSeq(): 0x8n = n length bytes follow
 	if (len == -128) {
 		len = ba.size() - off;
 	} else if (len < 0) {
