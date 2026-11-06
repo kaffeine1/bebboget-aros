@@ -296,7 +296,7 @@ int MessageDigest::emsaPssVerify(uint8_t const *m, int mLen, int emBits, int sal
 	update (Z8, 8);
 	update(mHash, l);
 	update(data + j, saltLen);
-	uint8_t h2[l];
+	uint8_t h2[64]; // not a VLA: m68k gcc -mregparm read it through (sp)+, which steps by 2
 	digest(h2);
 
 #ifdef DEBUG
