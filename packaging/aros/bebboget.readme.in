@@ -1,0 +1,86 @@
+Short:        HTTPS downloader with TLS 1.3, no deps
+Author:       Stefan "Bebbo" Franke <s.franke@bebbosoft.de>
+Uploader:     Michele Dipace <michele.dipace@kaffeine.net>
+Type:         comm/net
+Version:      @VERSION@
+Architecture: @ARCH_TOKEN@
+
+bebboget for AROS @TARGET_SHORT@
+==============================================================================
+
+bebboget gets files from HTTPS and HTTP servers. It only needs
+bsdsocket.library, the AROS TCP/IP stack, and supports TLS 1.2 and TLS 1.3.
+installcerts installs root certificates from a PEM bundle.
+
+This is my AROS port of bebboget by Stefan "Bebbo" Franke. His Amiga version
+is comm/net/bebboget.lha on Aminet.
+
+This archive is for @TARGET_LONG@.
+The builds for the other AROS targets (i386, x86_64, aarch64) are separate
+archives.
+
+==============================================================================
+INSTALL
+
+Copy the two programs to C: or to another directory in the path:
+
+    Copy bebboget installcerts C:
+
+bebboget keeps a random seed in ENVARC:bebboget/random_seed.
+
+==============================================================================
+CERTIFICATES
+
+bebboget comes without certificates. For a server it cannot verify it asks
+at the console: (a)bort, (i)nstall or (c)ontinue. To install the root
+certificates of the curl CA bundle once:
+
+    bebboget --sloppy -D RAM: -o cacert.pem https://curl.se/ca/cacert.pem
+    installcerts RAM:cacert.pem
+
+--sloppy skips the certificate checks for that download. If you prefer, copy
+cacert.pem from a machine you trust instead.
+
+The certificates go to SYS:Prefs/Env-Archive/certs.
+
+==============================================================================
+USAGE
+
+    bebboget [options] <url>
+
+For example:
+
+    bebboget -D RAM: https://aminet.net/comm/net/bebboget.readme
+
+bebboget -? lists the options. Ctrl-C stops a download. A download that ends
+before its Content-Length is reported and returns 10.
+
+==============================================================================
+KNOWN LIMITS
+
+- The HTTP status is not checked: an error page from the server is saved as
+  the file.
+- TLS 1.2 has no ECDHE-ECDSA cipher suites: such servers need TLS 1.3.
+- A server whose chain ends in a cross-signed root that is no longer in the
+  bundle needs a confirmation at the console (www.google.com today).
+- Errors such as "certificate not accepted" return 0.
+@ARCH_LIMITS@
+==============================================================================
+SOURCE AND LICENSE
+
+GNU GPL v3 or later; the files derived from SUPERCOP are public domain. See
+COPYING and LICENSE.
+
+Source of this build: https://github.com/kaffeine1/bebboget-aros
+(@SOURCE_REF@)
+Upstream: https://franke.ms/git/bebbo/bebboget
+
+==============================================================================
+HISTORY
+
+@VERSION@ (@DATE@)
+* first AROS build, from bebboget 1.11 with the fixes I sent upstream:
+  certificate dates, RSA work buffers, P-384 reduction, ECDSA curve choice,
+  SHA-384/SHA-512 RSA signatures, long ASN.1 lengths, variadic lists on
+  64 bit, http:// port, quoted file names, truncated downloads, the lock of a
+  new certificate directory, Content-Length split across reads

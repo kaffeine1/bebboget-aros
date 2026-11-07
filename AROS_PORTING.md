@@ -46,6 +46,14 @@ aarch64:
     make -f Makefile.aros-aarch64 all AROS_TOOLCHAIN=<toolchain dir> \
       SYSROOT=<AROS raspi-aarch64 build>/bin/raspi-aarch64/AROS/Developer
 
+Release archives, one per target, with an LhA that can create archives (LHa
+for UNIX; lhasa only extracts):
+
+    LHA=<lha> scripts/package-aros.sh <i386|x86_64|aarch64> <build dir> <output dir>
+
+Each gives `bebboget-aros-<target>.lha` and the matching Aminet `.readme`,
+made from `packaging/aros/bebboget.readme.in`.
+
 ## What the port changes
 
 - `src/socket_glue_aros.c`: on AROS the socket calls exist only as macros of
