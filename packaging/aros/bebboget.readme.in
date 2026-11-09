@@ -1,26 +1,21 @@
-Short:        HTTPS downloader with TLS 1.3, no deps
-Author:       Stefan "Bebbo" Franke <s.franke@bebbosoft.de>
-Uploader:     Michele Dipace <michele.dipace@kaffeine.net>
-Type:         comm/net
-Version:      @VERSION@
-Architecture: @ARCH_TOKEN@
+WHAT IS THIS?
 
-bebboget for AROS @TARGET_SHORT@
-==============================================================================
-
-bebboget gets files from HTTPS and HTTP servers. It only needs
-bsdsocket.library, the AROS TCP/IP stack, and supports TLS 1.2 and TLS 1.3.
+bebboget gets files from HTTPS and HTTP servers. It supports TLS 1.2 and
+TLS 1.3 and needs only bsdsocket.library: the crypto code is built in.
 installcerts installs root certificates from a PEM bundle.
 
-This is my AROS port of bebboget by Stefan "Bebbo" Franke. His Amiga version
-is comm/net/bebboget.lha on Aminet.
+bebboget is by Stefan "Bebbo" Franke. This archive is my port to
+@TARGET_LONG@.
+The original 68k version is comm/net/bebboget.lha;
+@OTHER1@,
+@OTHER2@.
 
-This archive is for @TARGET_LONG@.
-The builds for the other AROS targets (i386, x86_64, aarch64) are separate
-archives.
+REQUIREMENTS
 
-==============================================================================
-INSTALL
+- @REQUIRES@.
+- A configured TCP/IP stack (AROSTCP, bsdsocket.library).
+
+INSTALLATION
 
 Copy the two programs to C: or to another directory in the path:
 
@@ -28,7 +23,6 @@ Copy the two programs to C: or to another directory in the path:
 
 bebboget keeps a random seed in ENVARC:bebboget/random_seed.
 
-==============================================================================
 CERTIFICATES
 
 bebboget comes without certificates. For a server it cannot verify it asks
@@ -43,7 +37,6 @@ cacert.pem from a machine you trust instead.
 
 The certificates go to SYS:Prefs/Env-Archive/certs.
 
-==============================================================================
 USAGE
 
     bebboget [options] <url>
@@ -55,7 +48,6 @@ For example:
 bebboget -? lists the options. Ctrl-C stops a download. A download that ends
 before its Content-Length is reported and returns 10.
 
-==============================================================================
 KNOWN LIMITS
 
 - The HTTP status is not checked: an error page from the server is saved as
@@ -65,22 +57,29 @@ KNOWN LIMITS
   bundle needs a confirmation at the console (www.google.com today).
 - Errors such as "certificate not accepted" return 0.
 @ARCH_LIMITS@
-==============================================================================
+
 SOURCE AND LICENSE
 
 GNU GPL v3 or later; the files derived from SUPERCOP are public domain. See
-COPYING and LICENSE.
+COPYING and LICENSE. Source of this release:
+  https://github.com/kaffeine1/bebboget-aros/tree/@SOURCE_TAG@
+Original bebboget: https://franke.ms/git/bebbo/bebboget
+Bug reports: https://github.com/kaffeine1/bebboget-aros/issues
 
-Source of this build: https://github.com/kaffeine1/bebboget-aros
-(@SOURCE_REF@)
-Upstream: https://franke.ms/git/bebbo/bebboget
+Port by Michele Dipace <michele.dipace@kaffeine.net>.
 
-==============================================================================
+Support my work on the AROS port on Patreon:
+  https://www.patreon.com/c/kaffeine1
+or with a one-time contribution on Ko-fi:
+  https://ko-fi.com/kaffeine1
+Contributions are voluntary; no subscription is required to use
+this software.
+
 HISTORY
 
 @VERSION@ (@DATE@)
-* first AROS build, from bebboget 1.11 with the fixes I sent upstream:
+- First AROS release, from bebboget 1.11 with the fixes I sent upstream:
   certificate dates, RSA work buffers, P-384 reduction, ECDSA curve choice,
   SHA-384/SHA-512 RSA signatures, long ASN.1 lengths, variadic lists on
   64 bit, http:// port, quoted file names, truncated downloads, the lock of a
-  new certificate directory, Content-Length split across reads
+  new certificate directory, Content-Length split across reads.

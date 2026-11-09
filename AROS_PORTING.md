@@ -51,8 +51,12 @@ for UNIX; lhasa only extracts):
 
     LHA=<lha> scripts/package-aros.sh <i386|x86_64|aarch64> <build dir> <output dir>
 
-Each gives `bebboget-aros-<target>.lha` and the matching Aminet `.readme`,
-made from `packaging/aros/bebboget.readme.in`.
+Each gives `aminet/bebboget.<target>-aros.lha` with its `.readme` and the
+same archive for The AROS Archives in `arosarchives/` (`bebboget.i386-aros`,
+`bebboget.x86_64-aros-v11`, `bebboget.aarch64-aros`, with a `_lha.readme`).
+Both readmes share the body in `packaging/aros/bebboget.readme.in`; its
+source link points to the tag `v<version>-aros-<target>` (`i386-abiv0` for
+i386).
 
 ## What the port changes
 
