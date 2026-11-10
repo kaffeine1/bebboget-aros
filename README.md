@@ -28,7 +28,10 @@ One source tree builds three AROS targets:
 | x86_64 `mincrt` (AROS One 64-bit) | `Makefile.aros-x86_64` | AROS One x86_64 under QEMU |
 | aarch64 (AROS on the Raspberry Pi) | `Makefile.aros-aarch64` | Raspberry Pi 400; QEMU `raspi3b`, short transfers only |
 
-There is no AROS release yet.
+Releases, one per target, are on the
+[releases page](https://github.com/kaffeine1/bebboget-aros/releases). I
+uploaded the same archives to Aminet (`comm/net`) and The AROS Archives
+(`network/misc`).
 
 What works: HTTPS downloads over TLS 1.2 and TLS 1.3 (ChaCha20-Poly1305 and
 AES-GCM), certificate checks against the root certificates installed with
