@@ -81,6 +81,16 @@ i386).
   answer.
 - aarch64: `-ffixed-x18`, `-fno-common` and `-fsigned-char`, as in BebboSSH
   AROS.
+- aarch64: built and linked with `-noposixc`, so the programs open
+  stdc.library and stdcio.library only. A program that opens AROS
+  posixc.library loses about 160 KB when it ends: the OpenLib hook
+  `__posixc_publish_stdbases()` (`compiler/crt/posixc/__threadhook.c`) opens
+  stdc.library and stdcio.library, both per-opener, `__posixc_startup()` then
+  replaces the two base pointers with the program's own, and nothing closes
+  the bases the hook opened. `-noposixc` also removes the posixc headers:
+  `include/aros_noposixc` has `sys/types.h`, `sys/time.h`, `sys/stat.h` and
+  `sys/select.h` (types only), and `src/aros_noposixc.c` has
+  `gettimeofday()`, the one posixc function the sources call.
 
 ## Checks on x86_64
 
@@ -103,3 +113,11 @@ On the aarch64 `raspi3b` VM: the self-tests and the same certificate checks.
 Its USB network ends every transfer after about 150 seconds, so files over
 about 130 KB do not complete there; the bytes that arrive match the
 reference files. The known limits are listed in `README.md`.
+
+On a Raspberry Pi 400 with its Ethernet: the self-tests, `installcerts`, the
+same certificate checks, downloads up to 26.5 MB compared with published
+SHA-256 sums over TLS 1.3 (all three ciphers) and TLS 1.2, and a break signal
+during a download. The Pi boots without a clock: set the date before any
+certificate check. Ten runs leave about 200 bytes each there (a system
+command: about 80).
+

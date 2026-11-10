@@ -1,7 +1,7 @@
 # AROS aarch64 (Raspberry Pi) build wrapper.
 # Uses the aarch64-aros crosstools toolchain (GCC 6.5.0) with the sysroot of an
 # AROS raspi-aarch64 build: the compiler's default spec links startup.o, the
-# posixc/stdc libraries and libautoinit, so AROS_SDK_ROOT stays unset.
+# stdc libraries and libautoinit, so AROS_SDK_ROOT stays unset.
 #
 #   make -f Makefile.aros-aarch64 AROS_TOOLCHAIN=<toolchain dir> SYSROOT=<AROS>/Developer
 
@@ -22,6 +22,25 @@ STRIP_OUTPUTS ?= yes
 # -fno-common: the AROS loader rejects COMMON symbols in the relocatable ELF.
 # -fsigned-char: char is unsigned on aarch64; keep the signed char of the
 # other targets, which the code was written and tested with.
-TARGET_CFLAGS ?= --sysroot=$(SYSROOT) -ffixed-x18 -fno-common -fsigned-char
+# -noposixc: no posixc.library. A program that opens it loses about 160 KB
+# when it ends (the library opens stdc.library and stdcio.library for itself
+# and does not close them). The option also removes the posixc headers:
+# include/aros_noposixc has the four that the sources and the bsdsocket
+# prototypes ask for, and src/aros_noposixc.c has gettimeofday().
+TARGET_CFLAGS ?= --sysroot=$(SYSROOT) -ffixed-x18 -fno-common -fsigned-char \
+	-noposixc -Iinclude/aros_noposixc
+SDK_LDFLAGS ?= -noposixc
+LIB_SOURCES ?= socket_glue_aros.c bg.cpp \
+	biginteger.cpp unhexlify.c equals.cpp dump.c \
+	stream.cpp socket.cpp \
+	vector.cpp c++support.cpp \
+	chacha20.cpp poly1305.cpp chacha20poly1305.cpp \
+	md.cpp sha256.cpp sha384512.cpp sha512.cpp sha384.cpp sha.cpp md5.cpp bc.cpp \
+	aes.cpp rc4.cpp des.cpp des3.cpp gcm.cpp \
+	rand.c aros_randpool.cpp log.c mimedecode.c certstuff.cpp \
+	x25519.cpp \
+	pkcs6.cpp ecmath.cpp fastmath.cpp asn1.cpp secpXXXr1.cpp \
+	ssl3.cpp ssl3client.cpp \
+	aros_noposixc.c
 
 include Makefile.aros
