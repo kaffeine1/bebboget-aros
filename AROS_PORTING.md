@@ -121,3 +121,8 @@ during a download. The Pi boots without a clock: set the date before any
 certificate check. Ten runs leave about 200 bytes each there (a system
 command: about 80).
 
+At a console there (an SSH session of BebboSSH in console mode): the
+certificate question with the answers `a`, `c` and `i`, and Ctrl-C during a
+download. `i` names the file after the owner of the certificate, so a
+cross-signed root replaces the installed root of the same name.
+
