@@ -43,7 +43,8 @@ aarch64)
 	requires="AROS for the Raspberry Pi (aarch64) with AROSTCP"
 	other1="the AROS i386 build is comm/net/bebboget.i386-aros.lha"
 	other2="the AROS x86_64 build is comm/net/bebboget.x86_64-aros.lha"
-	limits="- aarch64: tested in QEMU (raspi3b) only, not yet on a real Raspberry Pi.
+	limits="- aarch64: the Raspberry Pi has no clock. Set the date first (Date), or
+  the certificates are reported as not valid today.
 - aarch64: the AROS system for the Raspberry Pi has no LhA. Unpack the
   archive on another computer and copy the bebboget drawer to the SD card."
 	;;

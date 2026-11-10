@@ -26,7 +26,7 @@ One source tree builds three AROS targets:
 | --- | --- | --- |
 | i386 `alt-abiv0` (AROS One 32-bit) | `Makefile.aros` | AROS One i386 under QEMU |
 | x86_64 `mincrt` (AROS One 64-bit) | `Makefile.aros-x86_64` | AROS One x86_64 under QEMU |
-| aarch64 (AROS on the Raspberry Pi) | `Makefile.aros-aarch64` | QEMU `raspi3b`, short transfers only |
+| aarch64 (AROS on the Raspberry Pi) | `Makefile.aros-aarch64` | Raspberry Pi 400; QEMU `raspi3b`, short transfers only |
 
 There is no AROS release yet.
 
@@ -53,9 +53,11 @@ Known limits:
   the file.
 - x86_64: about 6 KB of memory stay allocated after each run, because the
   minimal C runtime does not free at exit.
-- aarch64: not tested on real hardware yet. In the QEMU VM every transfer
-  ends after about 150 seconds (slow USB network of the VM); the bytes that
-  arrive are correct.
+- aarch64: the Raspberry Pi boots without a clock. Set the date first, or
+  the certificates are reported as not valid today.
+- aarch64: in the QEMU VM every transfer ends after about 150 seconds (slow
+  USB network of the VM); on a Raspberry Pi 400 files up to 26.5 MB arrive
+  complete.
 
 Build and port notes: `AROS_PORTING.md`.
 
