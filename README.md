@@ -29,9 +29,9 @@ One source tree builds three AROS targets:
 | aarch64 (AROS on the Raspberry Pi) | `Makefile.aros-aarch64` | Raspberry Pi 400; QEMU `raspi3b`, short transfers only |
 
 Releases, one per target, are on the
-[releases page](https://github.com/kaffeine1/bebboget-aros/releases). I
-uploaded the same archives to Aminet (`comm/net`) and The AROS Archives
-(`network/misc`).
+[releases page](https://github.com/kaffeine1/bebboget-aros/releases). The
+same archives are on Aminet (`comm/net`, `bebboget.<target>-aros.lha`) and
+The AROS Archives (`network/misc`).
 
 What works: HTTPS downloads over TLS 1.2 and TLS 1.3 (ChaCha20-Poly1305 and
 AES-GCM), certificate checks against the root certificates installed with
